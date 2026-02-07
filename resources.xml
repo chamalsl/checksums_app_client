@@ -5,6 +5,7 @@
     <file>wrong.svg</file>
     <file>warning.svg</file>
     <file>coconut.png</file>
+    <file>app.checksums.svg</file>
   </gresource>
   <gresource prefix="/data">
     <file>VERSION</file>
