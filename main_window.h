@@ -52,6 +52,7 @@ private:
   Glib::RefPtr<Gdk::Pixbuf> m_correct;
   Glib::RefPtr<Gdk::Pixbuf> m_wrong;
   Glib::RefPtr<Gdk::Pixbuf> m_warning;
+  Glib::RefPtr<Gdk::Pixbuf> m_app_icon;
   Glib::RefPtr<Gtk::FileChooserNative> m_file_dialog;
   Glib::Dispatcher m_Dispatcher;
   std::unique_ptr<std::string> m_version;

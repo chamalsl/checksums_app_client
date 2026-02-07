@@ -25,15 +25,15 @@ MainWindow::MainWindow()
   set_position(Gtk::WIN_POS_CENTER);
   set_title("Checksums");
   set_default_size(660,400);
-
   auto css_provider = Gtk::CssProvider::create();
   css_provider->load_from_resource("/css/shasums.css");
   Gtk::StyleContext::add_provider_for_screen(Gdk::Screen::get_default(),css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
   m_resultText.set_name("result_text");
-
   m_correct = Gdk::Pixbuf::create_from_resource("/images/correct.svg");
   m_wrong = Gdk::Pixbuf::create_from_resource("/images/wrong.svg");
   m_warning = Gdk::Pixbuf::create_from_resource("/images/warning.svg");
+  m_app_icon = Gdk::Pixbuf::create_from_resource("/images/app.checksums.svg");
+  set_icon(m_app_icon);
 
   m_version = Utils::getVersion();
   m_aboutDialog.set_transient_for(*this);
@@ -125,7 +125,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
     p_dispatcher->emit(); \
     return result; \
 
-  #define ERROR \
+  #define HANDLE_ERROR \
     task_status->error = true; \
     p_dispatcher->emit(); \
     return result; \
@@ -135,7 +135,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (!std::filesystem::exists(file_path)){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "File does not exist!";
-    ERROR;
+    HANDLE_ERROR;
   }
 
   size_t file_size = std::filesystem::file_size(file_path);
@@ -143,7 +143,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (file_size == 0){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "File is empty!";
-    ERROR
+    HANDLE_ERROR
   }
 
   unsigned char *sha_256_hash;
@@ -159,7 +159,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (!data){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "Could not allocate memory.!";
-    ERROR;
+    HANDLE_ERROR;
   }
   std::ifstream file_stream(file_path, std::ios_base::binary);
 
@@ -176,13 +176,13 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (EVP_DigestInit_ex(evp_ctx_256, EVP_sha256(), NULL) != 1){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "Error occurred while calculating sha 256.!";
-    ERROR;
+    HANDLE_ERROR;
   }
 
   if (EVP_DigestInit_ex(evp_ctx_512, EVP_sha512(), NULL) != 1){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "Error occurred while calculating sha 512.!";
-    ERROR;
+    HANDLE_ERROR;
   }
   
   while (!file_stream.eof()) {
@@ -192,7 +192,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
           || EVP_DigestUpdate(evp_ctx_512, data, file_stream.gcount()) != 1 ){
         result->m_resultType = Result::RESULT_TYPE::WRONG;
         result->m_message = "Error occurred while calculating checksums.!";
-        ERROR;
+        HANDLE_ERROR;
       }else {
         read_count = read_count + file_stream.gcount();
         task_status->percentage = (((double)read_count/file_size) * 90);
@@ -208,7 +208,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (!sha_256_hash){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "Could not allocate memory.!";
-    ERROR;
+    HANDLE_ERROR;
   }
   EVP_DigestFinal_ex(evp_ctx_256, sha_256_hash, NULL);
   std::string local_sha256 = Utils::toHex(sha_256_hash, digest_size);
@@ -218,7 +218,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   if (!sha_512_hash){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     result->m_message = "Could not allocate memory.!";
-    ERROR;
+    HANDLE_ERROR;
   }
   EVP_DigestFinal_ex(evp_ctx_512, sha_512_hash, NULL);
   std::string local_sha512 = Utils::toHex(sha_512_hash, digest_size);
@@ -234,7 +234,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
 
   std::transform(local_sha256.begin(), local_sha256.end(), local_sha256.begin(), static_cast<int(*)(int)>(std::tolower));
   std::transform(local_sha512.begin(), local_sha512.end(), local_sha512.begin(), static_cast<int(*)(int)>(std::tolower));
-  std::string file_name = std::filesystem::path(file_path).filename();
+  std::string file_name = std::filesystem::path(file_path).filename().string();
 
   std::pair<short, std::string> response = Api::findByChecksums(local_sha256, local_sha512, apiToken);
   result->m_httpStatus = response.first;
