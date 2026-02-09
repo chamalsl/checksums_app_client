@@ -3,13 +3,11 @@
 #include <curl/curl.h>
 #include <unistd.h>
 #include <stdlib.h>
-#include <pwd.h>
 #include <gtkmm.h>
 #include <fstream>
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <filesystem>
-#include <libsecret/secret.h>
 
 
 std::string Utils::calculateSha256Sum(std::string file_path_str){
@@ -132,6 +130,7 @@ std::pair<short, std::string> Utils::requestURLWithPost(std::string p_url, std::
   curl_easy_setopt(curl_conn, CURLOPT_URL, url);
   curl_easy_setopt(curl_conn, CURLOPT_MIMEPOST, post_data);
   curl_easy_setopt(curl_conn, CURLOPT_TIMEOUT, 10L);
+  curl_easy_setopt(curl_conn, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
   curl_easy_setopt(curl_conn, CURLOPT_WRITEFUNCTION, getResponseFromCurl);
   std::string data;
   curl_easy_setopt(curl_conn, CURLOPT_WRITEDATA, (void *)&data);
@@ -161,47 +160,6 @@ std::pair<short, std::string> Utils::requestURLWithPost(std::string p_url, std::
   return std::make_pair(m_status, data);
 }
 
-std::string Utils::getHomeDirectory()
-{
-    std::string home_dir_str("");
-    char* home_dir = getenv("HOME");
-    if (home_dir == NULL) {
-        long buf_size = sysconf(_SC_GETPW_R_SIZE_MAX);
-        char* buf;
-        struct passwd pw;
-        struct passwd* result;
-        if (buf_size == -1){
-            buf_size = 20000;
-        }
-        buf = (char*)malloc(buf_size);
-        if (!buf){
-            return std::string();
-        }
-        int rc = getpwuid_r(getuid(), &pw, buf, buf_size, &result);
-        if (result == NULL){
-            return std::string();
-        }
-        
-        home_dir_str.append(pw.pw_dir);
-        free(buf);
-    } else {
-        home_dir_str.append(home_dir);
-    }
-    
-    return home_dir_str;
-}
-
-std::string Utils::getDataDirectory()
-{
-    std::string home_dir = Utils::getHomeDirectory();
-    if (home_dir.empty()){
-        return std::string();
-    }
-
-    std::filesystem::path home_dir_path(home_dir);
-    home_dir_path.append(".local/share/rammini.com/checksums");
-    return home_dir_path.u8string();
-}
 
 std::unique_ptr<std::string> Utils::getVersion()
 {
@@ -225,67 +183,6 @@ std::unique_ptr<std::string> Utils::getVersion()
   }
 }
 
-const SecretSchema* Utils::getSecretStoreSchema()
-{
-    static const SecretSchema checksum_token_schema = {
-      "app.checksums.access_token", SECRET_SCHEMA_NONE,
-      {
-        {SECRET_STORE_SCHEMA_APPLICATION.c_str(), SECRET_SCHEMA_ATTRIBUTE_STRING}, 
-        {SECRET_STORE_SCHEMA_URL.c_str(), SECRET_SCHEMA_ATTRIBUTE_STRING}, 
-        {"NULL", SECRET_SCHEMA_ATTRIBUTE_INTEGER},
-      }
-    };
-    return &checksum_token_schema;
-}
-
-bool Utils::storeAccessToken(const char* access_token)
-{
-    GError *error = NULL;
-    secret_password_store_sync (Utils::getSecretStoreSchema(), SECRET_COLLECTION_DEFAULT,
-                              "checksums.app Access Token", access_token, NULL, &error,
-                              SECRET_STORE_SCHEMA_APPLICATION.c_str(), SECRET_STORE_APP_NAME.c_str(),
-                              SECRET_STORE_SCHEMA_URL.c_str(), SECRET_STORE_APP_URL.c_str(),
-                              NULL);
-
-    if (error != NULL) {
-       g_error_free (error);
-       return false;
-    } else {
-       return true;
-    }
-}
-
-bool Utils::deleteAccessToken()
-{
-    GError *error = NULL;
-    gboolean removed = secret_password_clear_sync (Utils::getSecretStoreSchema(), NULL, &error,
-                                              SECRET_STORE_SCHEMA_APPLICATION.c_str(), SECRET_STORE_APP_NAME.c_str(),
-                                              SECRET_STORE_SCHEMA_URL.c_str(), SECRET_STORE_APP_URL.c_str(),NULL);
-
-    if (error != NULL) {
-        g_error_free (error);
-    } 
-    return removed;
-}
-
-std::string Utils::getAccessToken()
-{
-    GError *error = NULL;
-    gchar *access_token = secret_password_lookup_sync (Utils::getSecretStoreSchema(), NULL, &error,
-                                                SECRET_STORE_SCHEMA_APPLICATION.c_str(), SECRET_STORE_APP_NAME.c_str(),
-                                                SECRET_STORE_SCHEMA_URL.c_str(), SECRET_STORE_APP_URL.c_str(),NULL);
-    std::string access_token_str;
-
-    if (error != NULL) {
-        g_error_free (error);
-    } 
-    
-    if (access_token != NULL) {
-        access_token_str.append(access_token);
-    } 
-
-    return access_token_str;
-}
 
 void Utils::showError(std::string error_msg)
 {

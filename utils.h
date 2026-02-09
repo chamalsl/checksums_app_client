@@ -1,13 +1,14 @@
 #include <string>
 #include <memory>
 #include <map>
-#include <libsecret/secret.h>
+
 
 static const std::string SECRET_STORE_SCHEMA_APPLICATION = "Application";
 static const std::string SECRET_STORE_SCHEMA_URL = "URL";
 static const std::string SECRET_STORE_TOKEN_NAME = "app.checksums Access Token";
 static const std::string SECRET_STORE_APP_NAME = "Checksums";
 static const std::string SECRET_STORE_APP_URL = "https://checksums.app/";
+static const std::string SECRET_STORE_TOKEN_NAME_WINDOWS = "app.checksums Access Token";
 
 class Utils{
 
@@ -27,8 +28,5 @@ class Utils{
   static bool deleteAccessToken();
   static std::string getAccessToken();
   static void showError(std::string error_msg);
-
-  private:
-  static const SecretSchema* getSecretStoreSchema();
 
 };
