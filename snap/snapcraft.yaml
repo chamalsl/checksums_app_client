@@ -13,6 +13,9 @@ description: |
   This application will calculate SHA-256 and SHA-512 checksums of your file.
   Then verify those checksums with checksums stored at https://checksums.app.
 
+  Your files will not be uploaded to our server. 
+  Only sha256, sha512 and file name of selected file will be sent to https://checksums.app for verification.
+
 grade: stable #devel 
 confinement: strict #devmode 
 
