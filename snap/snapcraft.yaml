@@ -4,8 +4,8 @@ adopt-info: version-provider
 title: Checksums App
 contact: support@rammini.com
 license: MIT
-issues: https://github.com/chamalsl/checksum_linux_client/issues
-source-code: https://github.com/chamalsl/checksum_linux_client
+issues: https://github.com/chamalsl/checksums_app_client/issues
+source-code: https://github.com/chamalsl/checksums_app_client
 website: https://checksums.app/
 icon: icon.svg
 summary: Application to calculate and verify SHA-256 and SHA-512 checksums.
