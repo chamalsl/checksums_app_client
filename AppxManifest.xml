@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Package
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities">
+  <Identity Name="checksums.app" Version="1.0.3.0" Publisher="CN=checksums.app, O=rammini, L=Colombo, C=Sri Lanka" ProcessorArchitecture="x64" />
+  <Properties>
+    <DisplayName>Checksums App</DisplayName>
+    <PublisherDisplayName>Chamal De Silva</PublisherDisplayName>
+    <Description>
+    This application will calculate SHA-256 and SHA-512 checksums of your file.
+    Then verify those checksums with checksums stored at https://checksums.app.
+
+    Your file will not be uploaded to our server. 
+    Only sha256, sha512 and file name of selected file will be sent to https://checksums.app for verification.
+    </Description>
+    <Logo>app.checksums.png</Logo>
+  </Properties>
+  <Resources>
+    <Resource Language="en-us" />
+  </Resources>
+  <Dependencies>
+    <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26200.0" />
+  </Dependencies>
+  <Capabilities>
+    <rescap:Capability Name="runFullTrust"/>
+    <rescap:Capability Name="internetClient"/>
+  </Capabilities>
+  <Applications>
+    <Application Id="checksums.app" Executable="checksums.exe"
+      uap10:RuntimeBehavior="packagedClassicApp"
+      uap10:TrustLevel="mediumIL">
+      <uap:VisualElements DisplayName="Checksums App" Description="Application to calculate and verify SHA-256 and SHA-512 checksums." Square150x150Logo="images\app.checksums150x150.png"
+        Square44x44Logo="images\app.checksums44x44.png" BackgroundColor="aliceBlue" />
+    </Application>
+  </Applications>
+</Package>
