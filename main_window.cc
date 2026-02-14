@@ -24,7 +24,7 @@ MainWindow::MainWindow()
 {
   set_position(Gtk::WIN_POS_CENTER);
   set_title("Checksums");
-  set_default_size(660,400);
+  set_default_size(1050,400);
   auto css_provider = Gtk::CssProvider::create();
   css_provider->load_from_resource("/css/shasums.css");
   Gtk::StyleContext::add_provider_for_screen(Gdk::Screen::get_default(),css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -284,7 +284,8 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
 
   std::string result_message;
   if (json_obj->arrayItems.size() == 0){
-    result_message.append("Our database does not have any files with same checksum or filename.");
+    result_message.append("Unable to verify your file, because our database does not have any files with same checksum or file name.\n"
+                          "This does not mean your file is corrupt.");
     result_message.append("\n\nSha 256 :\n");
     result_message.append(local_sha256);
     result_message.append("\n\nSha 512 :\n");
