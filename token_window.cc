@@ -6,30 +6,24 @@
 
 
 TokenWindow::TokenWindow() : m_tokenLabel("Token"),
-                             m_saveTokenBtn("Save"),
                              m_cancelBtn("Cancel"),
-                             m_getTokenBtn(),
                              m_buttonBox(Gtk::Orientation::ORIENTATION_HORIZONTAL, 5)
 {
   set_title("Login");
   
-
-  m_getTokenBtn.set_uri(URL_API_GET_TOKEN);
-  m_getTokenBtn.set_label("Get Token");
-  m_formGrid.set_row_spacing(3);
-  m_formGrid.set_column_spacing(3);
+  m_userCode.set_editable(false); 
+  m_userCode.set_name("user_code");
+  m_formGrid.set_row_spacing(5);
+  m_formGrid.set_column_spacing(5);
   m_formGrid.attach(m_tokenLabel,0,0);
-  m_formGrid.attach(m_tokenText,1,0);
-  m_buttonBox.add(m_saveTokenBtn);
-  m_buttonBox.add(m_getTokenBtn);
-  m_buttonBox.add(m_cancelBtn);
-  m_formGrid.set_margin_top(4);
-  m_formGrid.set_margin_left(3);
-  m_formGrid.set_margin_right(3);
-  m_formGrid.attach(m_buttonBox, 0,2,3,1);
+  m_formGrid.attach(m_userCode,1,0);
+  m_buttonBox.pack_end(m_cancelBtn,Gtk::PACK_SHRINK,8);
+  m_formGrid.set_margin_top(8);
+  m_formGrid.set_margin_left(5);
+  m_formGrid.set_margin_right(5);
+  m_formGrid.attach(m_buttonBox, 1,2,3,1);
+  m_cancelBtn.grab_focus();
   add(m_formGrid);
-
-  m_saveTokenBtn.signal_clicked().connect(sigc::mem_fun(*this, &TokenWindow::saveToken));
   m_cancelBtn.signal_clicked().connect(sigc::mem_fun(*this, &TokenWindow::cancel));
   show_all_children();
 
@@ -44,21 +38,9 @@ void TokenWindow::setParentWindow(MainWindow *parent)
   m_parent = parent;
 }
 
-void TokenWindow::saveToken()
+void TokenWindow::showUserCode(std::string p_user_code)
 {
-  std::string token = m_tokenText.get_text();
-  if (token.empty()){
-    Utils::showError("Token is empty!");
-    return;
-  }
-
-  if (token.length() > 500) {
-    Utils::showError("Token has more than 500 characters!");
-    return;
-  }
-  m_parent->setLoginStatus(1, token);
-  Utils::storeAccessToken(token.c_str());
-  set_visible(false);
+  m_userCode.set_text(p_user_code);
 }
 
 void TokenWindow::cancel(){
