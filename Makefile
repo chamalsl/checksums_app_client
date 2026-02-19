@@ -2,7 +2,7 @@ BUILD := debug
 BUILD_DIR := build/${BUILD}/
 .DEFAULT_GOAL := ${BUILD_DIR}checksums
 
-pkgs = pkg-config --cflags gtkmm-3.0 libcurl libcrypto
+pkgs = pkg-config --cflags gtkmm-3.0 libcurl libcrypto libsoup-3.0
 ifneq ($(OS),Windows_NT)
 	pkgs += libsecret-1
 endif
@@ -30,14 +30,14 @@ LDFLAGS := ${ldflags.${BUILD}} ${ldflags.common}
 VPATH=$(BUILD_DIR)third_party/json_parser/
 CC=g++
 
-_OBJ := token_window.o main_window.o resources.o api.o utils.o third_party/json_parser/json_parser.o
+_OBJ := token_window.o main_window.o resources.o api.o utils.o pkce.o third_party/json_parser/json_parser.o
 ifeq ($(OS),Windows_NT)
 	_OBJ += utils_win.o
 else
 	_OBJ += utils_linux.o
 endif
 
-_TEST_OBJ := utils_unittest.o api_unittest.o
+_TEST_OBJ := utils_unittest.o api_unittest.o pkce_unittest.o
 OBJ := ${patsubst %,${BUILD_DIR}%,${_OBJ}}
 TEST_OBJ := ${patsubst %,${BUILD_DIR}%,${_TEST_OBJ}}
 $(shell mkdir -p $(BUILD_DIR))
@@ -53,7 +53,7 @@ ${BUILD_DIR}checksums: $(OBJ)
 	$(CC) ${LDFLAGS} -o ${BUILD_DIR}checksums shasums.cc $^ `${pkgconfig_link}`
 
 ${BUILD_DIR}run_tests: $(OBJ) $(TEST_OBJ)
-	$(CC) ${LDFLAGS} -o ${BUILD_DIR}run_tests run_tests.cc /usr/lib/x86_64-linux-gnu/libgtest.a $^ `${pkgconfig_link}`
+	$(CC) ${LDFLAGS} -o ${BUILD_DIR}run_tests run_tests.cc /usr/local/lib/libgtest.a $^ `${pkgconfig_link}`
 
 .PHONY: tests
 tests: ${BUILD_DIR}run_tests
