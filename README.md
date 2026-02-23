@@ -31,6 +31,7 @@ Application to verify checksums of files.
 1. `make` - Build a debug build..
 2. `make BUILD=release` - Build a release build.
 3. `make BUILD=sanitize_address` - Build with address sanitizer.
+4. `make CPPFLAGS="-DLOCAL_DEV"` - Build for local development using web server running on localhost.
 
 Built executable will be saved in build/{BUILD}/checksums.
 
