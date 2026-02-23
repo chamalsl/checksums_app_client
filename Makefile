@@ -30,7 +30,7 @@ LDFLAGS := ${ldflags.${BUILD}} ${ldflags.common}
 VPATH=$(BUILD_DIR)third_party/json_parser/
 CC=g++
 
-_OBJ := token_window.o main_window.o resources.o api.o utils.o pkce.o third_party/json_parser/json_parser.o
+_OBJ := token_window.o main_window.o resources.o api.o utils.o pkce.o config.o third_party/json_parser/json_parser.o
 ifeq ($(OS),Windows_NT)
 	_OBJ += utils_win.o
 else
@@ -44,10 +44,10 @@ $(shell mkdir -p $(BUILD_DIR))
 $(shell mkdir -p $(BUILD_DIR)third_party/json_parser/)
 
 ${BUILD_DIR}third_party/json_parser/%.o: %.cc
-	$(CC) -c -o $@ $< $(CXXFLAGS)
+	$(CC) $(CPPFLAGS) -c -o $@ $< $(CXXFLAGS)
 
 ${BUILD_DIR}%.o: %.cc
-	$(CC) -c -o $@ $< $(CXXFLAGS)
+	$(CC) $(CPPFLAGS) -c -o $@ $< $(CXXFLAGS)
 
 ${BUILD_DIR}checksums: $(OBJ)
 	$(CC) ${LDFLAGS} -o ${BUILD_DIR}checksums shasums.cc $^ `${pkgconfig_link}`
