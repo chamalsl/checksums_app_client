@@ -1,6 +1,7 @@
 #include "main_window.h"
 #include "utils.h"
 #include "api.h"
+#include "config.h"
 #include "result.h"
 #include <iostream>
 #include <string>
@@ -11,6 +12,7 @@
 #include <openssl/sha.h>
 #include <openssl/evp.h>
 #include <giomm/resource.h>
+#include <libsoup/soup.h>
 
 MainWindow::MainWindow()
 :m_mainContainer(Gtk::Orientation::ORIENTATION_VERTICAL, 5),
@@ -22,9 +24,19 @@ MainWindow::MainWindow()
  m_showAboutBtn(),
  m_resultImage()
 {
+
+  m_pkce = std::make_unique<PKCE>();
+  m_soupSession = soup_session_new();
+
+  #if defined(_WIN32) || defined(_WIN64)
+  m_os = "Windows";
+  #elif defined(__linux__)
+  m_os="Linux";
+  #endif
+
   set_position(Gtk::WIN_POS_CENTER);
-  set_title("Checksums");
-  set_default_size(1050,400);
+  set_title("Checksums App");
+  set_default_size(1100,400);
   auto css_provider = Gtk::CssProvider::create();
   css_provider->load_from_resource("/css/shasums.css");
   Gtk::StyleContext::add_provider_for_screen(Gdk::Screen::get_default(),css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
@@ -84,7 +96,7 @@ MainWindow::MainWindow()
   m_loginBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::handleLoginAndLogout));
   m_loginWindow = new TokenWindow();
   m_loginWindow->setParentWindow(this);
-  m_loginWindow->set_default_size(100,200);
+  m_loginWindow->set_default_size(200,200);
   m_loginWindow->set_modal(true);
   m_loginWindow->set_transient_for(*this);
   m_loginWindow->set_position(Gtk::WIN_POS_CENTER_ON_PARENT);
@@ -379,7 +391,19 @@ void MainWindow::onFileSelected(int response_id)
 void MainWindow::handleLoginAndLogout()
 {
   if (m_apiToken.empty()) {
-    m_loginWindow->set_visible(true);
+    m_loginBtn.set_sensitive(false);
+    m_pkceData.reset();
+    m_pkceData.code_verifier = m_pkce->getCodeVerifier();
+    m_pkceData.code_verifier_sha256 = m_pkce->getCodeVerifierSha256( m_pkceData.code_verifier);
+    SoupMessage* msg = soup_message_new("POST", ChecksumsApp::URL_PKCE_CHALLENGE);
+    std::string post_data = "challenge=";
+    post_data.append(m_pkceData.code_verifier_sha256);
+    post_data.append("&device_os=");
+    post_data.append(m_os);
+    GBytes *body_bytes = g_bytes_new(post_data.c_str(), strlen(post_data.c_str()));
+    soup_message_set_request_body_from_bytes(msg, "application/x-www-form-urlencoded", body_bytes);
+    soup_message_headers_append(soup_message_get_request_headers(msg), "Accept", "application/json");
+    soup_session_send_and_read_async(m_soupSession, msg, G_PRIORITY_DEFAULT, NULL,MainWindow::handlePkceChallengeResponse, this);
   }else {
     bool status = Utils::deleteAccessToken();
     if (!status){
@@ -421,8 +445,111 @@ void MainWindow::showAbout()
   m_aboutDialog.present();
 }
 
+void MainWindow::handlePkceChallengeResponse(GObject* source, GAsyncResult* res, gpointer user_data)
+{
+  MainWindow* main_window = static_cast<MainWindow*>(user_data);
+  SoupSession *session = SOUP_SESSION (source);
+  GError* error = NULL;
+  GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
+
+  if (error) {
+      g_error_free(error);
+      main_window->m_loginBtn.set_sensitive(true);
+  } else {
+      gsize data_size;
+      char* response_data = (char*)g_bytes_get_data(bytes, &data_size);
+      std::string response_data_str(response_data, data_size);
+      JsonParser json_parser;
+      std::unique_ptr<JsonObject> json_obj = json_parser.parseJson(response_data_str);
+      JsonObject* device_code_json = JsonParser::findByPropertyName(json_obj.get(), "device_id");
+      JsonObject* user_code_json = JsonParser::findByPropertyName(json_obj.get(), "user_code");
+
+      if (device_code_json == NULL || user_code_json == NULL){
+         main_window->m_loginBtn.set_sensitive(true);
+         return;
+      }  
+
+      main_window->m_pkceData.device_code  = device_code_json->stringValue;
+      main_window->m_pkceData.user_code = user_code_json->stringValue;
+      std::string url_request_authorization = ChecksumsApp::URL_PKCE_REQUEST_DEVICE_AUTHORIZATION;
+      url_request_authorization.append(main_window->m_pkceData.device_code);
+      gtk_show_uri_on_window((GtkWindow*)main_window, url_request_authorization.c_str(),GDK_CURRENT_TIME, NULL);
+      g_bytes_unref(bytes);
+      main_window->m_loginWindow->clearData();
+      main_window->m_loginWindow->set_visible(true);
+      main_window->m_loginWindow->showUserCode(main_window->m_pkceData.user_code);
+      main_window->m_loginBtn.set_sensitive(false);
+  }
+}
+
+
+void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *res, gpointer user_data)
+{
+  MainWindow* main_window = static_cast<MainWindow*>(user_data);
+  SoupSession *session = SOUP_SESSION (source);
+  GError* error = NULL;
+  GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
+
+  if (error) {
+      g_error_free(error);
+      main_window->m_loginWindow->closeAndClear();
+      main_window->m_loginBtn.set_sensitive(true);
+  } else {
+      gsize data_size;
+      char* response_data = (char*)g_bytes_get_data(bytes, &data_size);
+      std::string response_data_str(response_data, data_size);
+      JsonParser json_parser;
+      std::unique_ptr<JsonObject> json_obj = json_parser.parseJson(response_data_str);
+      JsonObject* status_json = JsonParser::findByPropertyName(json_obj.get(), "status");
+      JsonObject* api_key_json = JsonParser::findByPropertyName(json_obj.get(), "api_key");
+
+      if (status_json == NULL || api_key_json == NULL){
+        main_window->m_pkceData.retries++;
+        //Try again
+        main_window->requestPkceApiKey();
+        return;
+      }  
+
+      main_window->m_apiToken = api_key_json->stringValue;
+      Utils::storeAccessToken(main_window->m_apiToken.c_str());
+      main_window->m_loginBtn.set_label("Logout");
+      main_window->m_pkceData.completed == true;
+      g_bytes_unref(bytes);
+      main_window->m_loginWindow->closeAndClear();
+      main_window->m_loginBtn.set_sensitive(true);
+  }
+}
+
+void MainWindow::requestPkceApiKey()
+{
+
+  std::cout << "Requesting Api Key : " << m_pkceData.retries << " \n";
+  if (m_pkceData.retries > 3){
+    std::cout << "Stop requesting Api Key. retires : " << m_pkceData.retries << " completed:" <<  m_pkceData.completed << " \n";
+    m_loginBtn.set_sensitive(true);
+    return;
+  }
+  
+  SoupMessage* msg = soup_message_new("POST", ChecksumsApp::URL_PKCE_REQUEST_API_KEY);
+  std::string post_data = "code_verifier=";
+  post_data.append(m_pkceData.code_verifier);
+  GBytes *body_bytes = g_bytes_new(post_data.c_str(), strlen(post_data.c_str()));
+  soup_message_set_request_body_from_bytes(msg, "application/x-www-form-urlencoded", body_bytes);
+  soup_message_headers_append(soup_message_get_request_headers(msg), "Accept", "application/json");
+  m_pkceData.retries++;
+  soup_session_send_and_read_async(m_soupSession, msg, G_PRIORITY_DEFAULT, NULL,MainWindow::handleRequestPkceApiKeyResponse, this); 
+}
+
+void MainWindow::cancelLoginProcess()
+{
+  m_pkceData.reset();
+  m_loginBtn.set_sensitive(true);
+}
 
 MainWindow::~MainWindow(){
+  if (m_soupSession) {
+    g_object_unref(m_soupSession);
+  }
   delete m_loginWindow;
 }
 
