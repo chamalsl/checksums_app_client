@@ -1,4 +1,5 @@
 #include "api.h"
+#include "config.h"
 #include "utils.h"
 #include <string>
 #include <algorithm>
@@ -6,9 +7,9 @@
 
 std::pair<short, std::string>  Api::findByFileName(std::string file_name, std::string apiToken)
 {
-  std::string url = URL_API_FIND_BY_NAME;
+  std::string url = ChecksumsApp::URL_API_FIND_BY_NAME;
   if (!apiToken.empty()){
-    url = URL_API_FIND_BY_NAME_AUTH;
+    url = ChecksumsApp::URL_API_FIND_BY_NAME_AUTH;
   }
 
   std::map<std::string, std::string> post_data;
@@ -20,9 +21,9 @@ std::pair<short, std::string>  Api::findByFileName(std::string file_name, std::s
 
 std::pair<short, std::string>  Api::findByChecksums(std::string sha256, std::string sha512, std::string apiToken)
 {
-    std::string url = URL_API_FIND_BY_CHECKSUMS;
+    std::string url = ChecksumsApp::URL_API_FIND_BY_CHECKSUMS;
     if (!apiToken.empty()){
-      url = URL_API_FIND_BY_CHECKSUMS_AUTH;
+      url = ChecksumsApp::URL_API_FIND_BY_CHECKSUMS_AUTH;
     }
 
     std::map<std::string, std::string> post_data;
