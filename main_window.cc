@@ -382,6 +382,14 @@ void MainWindow::onFileSelected(int response_id)
     case Gtk::ResponseType::RESPONSE_ACCEPT:{
       m_file_path = m_file_dialog->get_file()->get_path();
       m_fileNameText.set_text(m_file_path);
+      m_fileNameText.set_position(-1);
+ 
+      if (m_fileNameText.get_width_chars() < m_file_path.length()){
+        m_fileNameText.set_tooltip_text(m_file_path);
+      } else {
+         m_fileNameText.set_tooltip_text("");
+      }
+
       displayResult("",Result::RESULT_TYPE::EMPTY);
       break;
     }
