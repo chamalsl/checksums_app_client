@@ -144,7 +144,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
 
   std::unique_ptr<Result> result = std::make_unique<Result>();
   std::string local_checksums_result = "Checksums of selected file\n";
-  local_checksums_result.append("___________________________");
+  local_checksums_result.append("---------------------------------------------");
   std::filesystem::path file_path(file_path_str);
   if (!std::filesystem::exists(file_path)){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
@@ -304,22 +304,16 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   std::string result_message;
   if (json_obj->arrayItems.size() == 0){
     result_message.append("Unable to verify your file, because our database does not have any files with same checksum or file name.\n"
-                          "This does not mean your file is corrupt.");
-    result_message.append("\n\nSha 256 :\n");
-    result_message.append(local_sha256);
-    result_message.append("\n\nSha 512 :\n");
-    result_message.append(local_sha512);
+                          "This does not mean your file is corrupt.\n\n");
+    result_message.append(local_checksums_result);
     result->m_resultType = Result::RESULT_TYPE::WARNING;
     result->m_message = result_message;
     COMPLETED;
   }
   else if (json_obj->arrayItems.size() > 1){
     result_message.append("Our database has multiple files with same name.");
-    result_message.append("\nBut none of them have same sha 256 or sha512!");
-    result_message.append("\n\nSha 256 :\n");
-    result_message.append(local_sha256);
-    result_message.append("\n\nSha 512 :\n");
-    result_message.append(local_sha512);
+    result_message.append("\nBut none of them have same sha 256 or sha512!\n\n");
+    result_message.append(local_checksums_result);
     result->m_resultType = Result::RESULT_TYPE::WARNING;
     result->m_message = result_message;
     COMPLETED;
@@ -347,7 +341,7 @@ void MainWindow::onResultReceived()
       if (result->m_httpStatus == 401){
         Utils::showError("Your access token is invalid or expired.\n"
                         "Please click Check button again to verify a public file.\n"
-                        "Please request and enter a new token to verify a personal file.\n"
+                        "Please login again to verify a personal file.\n"
                         );
         handleLoginAndLogout();
         return;
@@ -367,6 +361,7 @@ void MainWindow::startVerifying(){
     return;
   }
 
+  displayResult("",Result::RESULT_TYPE::EMPTY);
   m_progressBar.set_no_show_all(false);
   m_progressBar.set_visible(true);
   m_taskStatus.error = false;
