@@ -20,7 +20,7 @@ TokenWindow::TokenWindow() : m_tokenLabel("Token"),
   m_tokenLabel.set_justify(Gtk::JUSTIFY_CENTER);
   m_tokenLabel.set_halign(Gtk::ALIGN_CENTER);
   m_tokenLabel.set_max_width_chars(30);
-  m_tokenLabel.set_text("Enter this security code in https://checksums.app to verify your device.!");
+  m_tokenLabel.set_text("Enter this security code in https://checksums.app to verify your device.\nThen press Done button!");
   m_tokenLabel.set_halign(Gtk::ALIGN_CENTER);
   m_userCode.set_editable(false); 
   m_userCode.set_name("Security Code");
@@ -93,5 +93,6 @@ void TokenWindow::cancel(){
 
 void TokenWindow::continueLogin()
 {
+  closeAndClear();
   m_parent->requestPkceApiKey();
 }

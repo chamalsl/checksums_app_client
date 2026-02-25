@@ -513,10 +513,9 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
       JsonObject* status_json = JsonParser::findByPropertyName(json_obj.get(), "status");
       JsonObject* api_key_json = JsonParser::findByPropertyName(json_obj.get(), "api_key");
 
-      if (status_json == NULL || api_key_json == NULL){
-        main_window->m_pkceData.retries++;
-        //Try again
-        main_window->requestPkceApiKey();
+      if (status_json == NULL || status_json->integerValue ==-1 || api_key_json == NULL){
+        main_window->cancelLoginProcess();
+        Utils::showError("Login failed! Did you enter security code?");
         return;
       }  
 
@@ -533,20 +532,12 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
 void MainWindow::requestPkceApiKey()
 {
 
-  std::cout << "Requesting Api Key : " << m_pkceData.retries << " \n";
-  if (m_pkceData.retries > 3){
-    std::cout << "Stop requesting Api Key. retires : " << m_pkceData.retries << " completed:" <<  m_pkceData.completed << " \n";
-    m_loginBtn.set_sensitive(true);
-    return;
-  }
-  
   SoupMessage* msg = soup_message_new("POST", ChecksumsApp::URL_PKCE_REQUEST_API_KEY);
   std::string post_data = "code_verifier=";
   post_data.append(m_pkceData.code_verifier);
   GBytes *body_bytes = g_bytes_new(post_data.c_str(), strlen(post_data.c_str()));
   soup_message_set_request_body_from_bytes(msg, "application/x-www-form-urlencoded", body_bytes);
   soup_message_headers_append(soup_message_get_request_headers(msg), "Accept", "application/json");
-  m_pkceData.retries++;
   soup_session_send_and_read_async(m_soupSession, msg, G_PRIORITY_DEFAULT, NULL,MainWindow::handleRequestPkceApiKeyResponse, this); 
 }
 

@@ -60,7 +60,6 @@ private:
     std::string code_verifier_sha256;
     std::string user_code;
     std::string device_code;
-    unsigned short retries = 0;
     bool completed = false;
 
     void reset() {
@@ -68,7 +67,6 @@ private:
         code_verifier_sha256 = "";
         user_code = "";
         device_code = "";
-        retries = 0;
         completed = false;
     }
 
