@@ -143,6 +143,8 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
     return result; \
 
   std::unique_ptr<Result> result = std::make_unique<Result>();
+  std::string local_checksums_result = "Checksums of selected file\n";
+  local_checksums_result.append("___________________________");
   std::filesystem::path file_path(file_path_str);
   if (!std::filesystem::exists(file_path)){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
@@ -247,6 +249,10 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   std::transform(local_sha256.begin(), local_sha256.end(), local_sha256.begin(), static_cast<int(*)(int)>(std::tolower));
   std::transform(local_sha512.begin(), local_sha512.end(), local_sha512.begin(), static_cast<int(*)(int)>(std::tolower));
   std::string file_name = std::filesystem::path(file_path).filename().string();
+  local_checksums_result.append("\n\nSha 256 :\n");
+  local_checksums_result.append(local_sha256);
+  local_checksums_result.append("\n\nSha 512 :\n");
+  local_checksums_result.append(local_sha512);
 
   std::pair<short, std::string> response = Api::findByChecksums(local_sha256, local_sha512, apiToken);
   result->m_httpStatus = response.first;
@@ -258,7 +264,8 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   }
 
   if (result->m_httpStatus != 200 || result->m_message.empty()){
-    result->m_message = "Network or system error!";
+    result->m_message = "Unable to verify your file due to network or System error!\n\n";
+    result->m_message.append(local_checksums_result);
     result->m_resultType = Result::RESULT_TYPE::WRONG;
     COMPLETED;
   }
