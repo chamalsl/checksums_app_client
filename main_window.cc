@@ -143,8 +143,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
     return result; \
 
   std::unique_ptr<Result> result = std::make_unique<Result>();
-  std::string local_checksums_result = "Checksums of selected file\n";
-  local_checksums_result.append("---------------------------------------------");
+  std::string local_checksums_result = "<b><u>Checksums of selected file</u></b>";
   std::filesystem::path file_path(file_path_str);
   if (!std::filesystem::exists(file_path)){
     result->m_resultType = Result::RESULT_TYPE::WRONG;
@@ -249,9 +248,9 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
   std::transform(local_sha256.begin(), local_sha256.end(), local_sha256.begin(), static_cast<int(*)(int)>(std::tolower));
   std::transform(local_sha512.begin(), local_sha512.end(), local_sha512.begin(), static_cast<int(*)(int)>(std::tolower));
   std::string file_name = std::filesystem::path(file_path).filename().string();
-  local_checksums_result.append("\n\nSha 256 :\n");
+  local_checksums_result.append("\n\nSha 256 : ");
   local_checksums_result.append(local_sha256);
-  local_checksums_result.append("\n\nSha 512 :\n");
+  local_checksums_result.append("\n\nSha 512 : ");
   local_checksums_result.append(local_sha512);
 
   std::pair<short, std::string> response = Api::findByChecksums(local_sha256, local_sha512, apiToken);
@@ -428,7 +427,9 @@ void MainWindow::handleLoginAndLogout()
 
 void MainWindow::displayResult(std::string message, Result::RESULT_TYPE result_type)
 {
-  m_resultText.get_buffer().get()->set_text(message);
+  auto text_buffer = m_resultText.get_buffer().get();
+  text_buffer->set_text("");
+  text_buffer->insert_markup(text_buffer->begin(),message);
   if (result_type == Result::RESULT_TYPE::CORRECT) {
     m_resultImage.set(m_correct);
   }

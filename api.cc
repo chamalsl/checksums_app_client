@@ -4,6 +4,7 @@
 #include <string>
 #include <algorithm>
 #include <map>
+#include <glibmm/markup.h>
 
 std::pair<short, std::string>  Api::findByFileName(std::string file_name, std::string apiToken)
 {
@@ -61,82 +62,71 @@ std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_fil
   std::transform(remote_sha512sum.begin(), remote_sha512sum.end(), remote_sha512sum.begin(), static_cast<int(*)(int)>(std::tolower));
 
   result.append("File name: ");
-  result.append(file_name_json->stringValue);
+  result.append(Glib::Markup::escape_text(file_name_json->stringValue));
   if (public_json->integerValue == 0) {
     result.append("\n(Personal file)");
   }
-  result.append("\n\n");
+  result.append("\n");
 
   if (local_file_sha512 == remote_sha512sum){
     matched = true;
-    result.append("Sha512 matched!\n");
+    result.append("\nSha512 matched!");
   }
   
   if (local_file_sha256 == remote_sha256sum){
     matched = true;
-    result.append("Sha256 matched!\n");
+    result.append("\nSha256 matched!");
   }
   if (!matched) {
-    result.append("Checksums did NOT match!\n\n");
+    result.append("\nChecksums <b>DID NOT</b> match!");
     result_type = Result::RESULT_TYPE::WRONG;
   }else{
     result_type = Result::RESULT_TYPE::CORRECT;
   }
 
-  result.append("\nChecksums of selected file \n");
-  result.append("__________________________ \n");
-  result.append("\nSha 512: ");
-  result.append(local_file_sha512);
-  result.append("\n");
-  result.append("\n");
+  result.append("\n\n<b><u>Checksums of selected file</u></b>");
 
-  result.append("Sha 256: ");
+  result.append("\n\nSha 256 : ");
   result.append(local_file_sha256);
-  result.append("\n");
-  result.append("\n");
+
+  result.append("\n\nSha 512 : ");
+  result.append(local_file_sha512);
 
   if (!matched) {
-    result.append("Checksums in our Database \n");
-    result.append("_________________________ \n");
-    if (!remote_sha512sum.empty()){
-      result.append("\nSha 512: ");
-      result.append(remote_sha512sum);
-      result.append("\n");  
+    result.append("\n\n<b><u>Checksums in our Database</u></b>");
+    if (!remote_sha256sum.empty()){
+      result.append("\n\nSha 256 : ");
+      result.append(Glib::Markup::escape_text(remote_sha256sum));
     }
 
-    if (!remote_sha256sum.empty()){
-      result.append("\nSha 256: ");
-      result.append(remote_sha256sum);
+    if (!remote_sha512sum.empty()){
+      result.append("\n\nSha 512 : ");
+      result.append(Glib::Markup::escape_text(remote_sha512sum));
     }
-    result.append("\n");
   }
   
-  result.append("\n");
   if (public_json->integerValue == 1) {
-    result.append("Software: ");
-    result.append(software_name_json->stringValue);
-    result.append("\n");
-    result.append("Version: ");
+    result.append("\n\nSoftware: ");
+    result.append(Glib::Markup::escape_text(software_name_json->stringValue));
+    result.append("\nVersion: ");
     if (version_json){
-      result.append(version_json->stringValue);
+      result.append(Glib::Markup::escape_text(version_json->stringValue));
     }     
-    result.append("\n");
-    result.append("Release date: ");
-    result.append(release_date_json->stringValue);
-    result.append("\n");
+    result.append("\nRelease date: ");
+    result.append(Glib::Markup::escape_text(release_date_json->stringValue));
   }
 
   std::string not_available_str;
   if (remote_sha256sum.empty()){
-    not_available_str.append("sha 256\n");
+    not_available_str.append("\nsha 256");
   }
 
    if(remote_sha512sum.empty()){
-    not_available_str.append("sha 512\n");
+    not_available_str.append("\nsha 512");
   }
 
   if (!not_available_str.empty()){
-    result.append("\n* These checksums were not available in our database.\n");
+    result.append("\n\n<b>* <i>These checksums were not available in our database.</i></b>");
     result.append(not_available_str);
   }
 
