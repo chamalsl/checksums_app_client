@@ -24,7 +24,4 @@ echo "Depends: libgtkmm-3.0-1t64 (>= 3.24.9), libcurl4t64 (>= 7.16.2) , libsecre
 cd release/Ubuntu24/
 dpkg-deb --build --root-owner-group ${RELEASE_FILE}/
 
-#Generate SHASUMS file
-sha256sum checksums >> SHASUMS
-sha256sum ${RELEASE_FILE}.deb >> SHASUMS
 echo "Done"
