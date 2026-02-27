@@ -1,14 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Package
-  xmlns="http://schemas.microsoft.com"
-  xmlns:uap="http://schemas.microsoft.com"
-  xmlns:rescap="http://schemas.microsoft.com/restrictedcapabilities">
+  xmlns="http://schemas.microsoft.com/appx/manifest/foundation/windows10"
+  xmlns:uap="http://schemas.microsoft.com/appx/manifest/uap/windows10"
+  xmlns:rescap="http://schemas.microsoft.com/appx/manifest/foundation/windows10/restrictedcapabilities"
+  xmlns:uap10="http://schemas.microsoft.com/appx/manifest/uap/windows10/10"
+  IgnorableNamespaces="uap rescap uap10">
   <Identity Name="checksums.app" Version="1.0.4.0" Publisher="CN=checksums.app, O=rammini, L=Colombo, C=Sri Lanka" ProcessorArchitecture="x64" />
   <Properties>
     <DisplayName>Checksums App</DisplayName>
     <PublisherDisplayName>Chamal De Silva</PublisherDisplayName>
     <Description>Application to verify SHA-256 and SHA-512.</Description>
-    <Logo>app.checksums.png</Logo>
+    <Logo>images\windows_installer\app.checksums44x44.png</Logo>
   </Properties>
   <Resources>
     <Resource Language="en-us" />
@@ -16,14 +18,15 @@
   <Dependencies>
     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19041.0" MaxVersionTested="10.0.26200.0" />
   </Dependencies>
-  <Capabilities>
-    <rescap:Capability Name="runFullTrust"/>
-    <Capability Name="internetClient"/>
-  </Capabilities>
+
   <Applications>
-    <Application Id="checksums.app" Executable="checksums.exe">
-      <uap:VisualElements DisplayName="Checksums App" Description="Application to calculate and verify SHA-256 and SHA-512 checksums." Square150x150Logo="images\app.checksums150x150.png"
-        Square44x44Logo="images\app.checksums44x44.png" BackgroundColor="aliceBlue" />
+    <Application Id="checksums.app" Executable="checksums.exe" EntryPoint="Windows.FullTrustApplication">
+      <uap:VisualElements DisplayName="Checksums App" Description="Application to calculate and verify SHA-256 and SHA-512 checksums." Square150x150Logo="images\windows_installer\app.checksums150x150.png"
+        Square44x44Logo="images\windows_installer\app.checksums44x44.png" BackgroundColor="aliceBlue" />
     </Application>
   </Applications>
+  <Capabilities>
+    <Capability Name="internetClient"/>
+    <rescap:Capability Name="runFullTrust"/>
+  </Capabilities>
 </Package>
