@@ -38,10 +38,12 @@ jobs:
         mkdir -p build/release/lib/gdk-pixbuf-2.0/2.10.0/loaders
         mkdir -p build/release/share/glib-2.0/schemas
         mkdir -p build/release/share/icons
+        mkdir -p lib/gio/modules
         
         # Copy GTK and dependencies DLLs
         ldd build/release/checksums.exe | grep '/ucrt64/bin/' | awk '{print $3}' | xargs -I {} cp {} build/release/ 2>/dev/null || true
         cp /ucrt64/bin/librsvg-2-2.dll build/release/
+        cp /ucrt64/lib/gio/modules/* lib/gio/modules
         
         # Copy pixbuf loaders
         cp /ucrt64/lib/gdk-pixbuf-2.0/2.10.0/loaders/*.dll build/release/lib/gdk-pixbuf-2.0/2.10.0/loaders/ 2>/dev/null || true
