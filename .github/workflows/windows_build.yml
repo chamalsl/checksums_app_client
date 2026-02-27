@@ -59,7 +59,7 @@ jobs:
         glib-compile-schemas build/release/share/glib-2.0/schemas/
 
     - name: Add makeappx.exe command to path.
-      shell: pwsh
+      shell: powershell
       run: |
         $sdkBinPath = Get-ChildItem -Path "C:\Program Files (x86)\Windows Kits\10\bin" -Recurse -File | Where-Object {$_.Name -eq "makeappx.exe" -and $_.Directory.Name -eq "x64"} |Sort-Object LastWriteTime -Descending | Select-Object -First 1 -ExpandProperty DirectoryName
         if ($null -eq $sdkBinPath) {
@@ -68,9 +68,11 @@ jobs:
         Write-Host "Found MakeAppx.exe at: $sdkBinPath"
         echo "$sdkBinPath" | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append
     - name: Create MSIX Package
+      shell: powershell
       run: |
+        echo "Current PATH: $env:Path"
         mkdir -p build/msix
-        makeappx pack /d build/release /p build/msix/checksums-app.msix
+        makeappx.exe pack /d build/release /p build/msix/checksums-app.msix
         
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
