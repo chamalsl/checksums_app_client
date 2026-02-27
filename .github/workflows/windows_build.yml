@@ -72,6 +72,7 @@ jobs:
       run: |
         echo "Current PATH: $env:Path"
         mkdir -p build/msix
+        cp AppxManifest.xml build/release
         makeappx.exe pack /d build/release /p build/msix/checksums-app.msix
         
     - name: Upload Artifact
