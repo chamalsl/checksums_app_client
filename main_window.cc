@@ -45,7 +45,7 @@ MainWindow::MainWindow()
   m_wrong = Gdk::Pixbuf::create_from_resource("/images/wrong.svg");
   m_warning = Gdk::Pixbuf::create_from_resource("/images/warning.svg");
   m_app_icon = Gdk::Pixbuf::create_from_resource("/images/app.checksums.svg");
-  set_icon(m_app_icon);
+  set_default_icon(m_app_icon);
 
   m_version = Utils::getVersion();
   m_aboutDialog.set_transient_for(*this);
@@ -464,9 +464,21 @@ void MainWindow::handlePkceChallengeResponse(GObject* source, GAsyncResult* res,
   GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
 
   if (error) {
+      std::string error_str = "";
+      error_str.append(error->message);
+      Utils::showError(error_str);
       g_error_free(error);
       main_window->m_loginBtn.set_sensitive(true);
+      return;
   } else {
+      SoupMessage *msg = soup_session_get_async_result_message (session, res);
+      guint status_code = soup_message_get_status (msg);
+
+      if (status_code != SOUP_STATUS_OK) {
+        Utils::showError("Could not login due to system or network error!");
+        main_window->m_loginBtn.set_sensitive(true);
+        return;
+      }
       gsize data_size;
       char* response_data = (char*)g_bytes_get_data(bytes, &data_size);
       std::string response_data_str(response_data, data_size);
@@ -476,6 +488,7 @@ void MainWindow::handlePkceChallengeResponse(GObject* source, GAsyncResult* res,
       JsonObject* user_code_json = JsonParser::findByPropertyName(json_obj.get(), "user_code");
 
       if (device_code_json == NULL || user_code_json == NULL){
+         Utils::showError("Could not login due to system or network error!");
          main_window->m_loginBtn.set_sensitive(true);
          return;
       }  
@@ -502,10 +515,24 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
   GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
 
   if (error) {
+      std::string error_str = "";
+      error_str.append(error->message);
+      Utils::showError(error_str);
       g_error_free(error);
-      main_window->m_loginWindow->closeAndClear();
+      main_window->cancelLoginProcess();
       main_window->m_loginBtn.set_sensitive(true);
+      return;
   } else {
+      SoupMessage *msg = soup_session_get_async_result_message (session, res);
+      guint status_code = soup_message_get_status (msg);
+
+      if (status_code != SOUP_STATUS_OK) {
+        Utils::showError("Could not login due to system or network error!");
+        main_window->cancelLoginProcess();
+        main_window->m_loginBtn.set_sensitive(true);
+        return;
+      }
+
       gsize data_size;
       char* response_data = (char*)g_bytes_get_data(bytes, &data_size);
       std::string response_data_str(response_data, data_size);
@@ -515,8 +542,9 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
       JsonObject* api_key_json = JsonParser::findByPropertyName(json_obj.get(), "api_key");
 
       if (status_json == NULL || status_json->integerValue ==-1 || api_key_json == NULL){
-        main_window->cancelLoginProcess();
         Utils::showError("Login failed! Did you enter security code?");
+        main_window->cancelLoginProcess();
+        main_window->m_loginBtn.set_sensitive(true);
         return;
       }  
 
