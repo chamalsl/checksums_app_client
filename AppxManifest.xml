@@ -10,7 +10,7 @@
     <DisplayName>Checksums App</DisplayName>
     <PublisherDisplayName>Chamal De Silva</PublisherDisplayName>
     <Description>Application to verify SHA-256 and SHA-512.</Description>
-    <Logo>images\windows_installer\app.checksums44x44.png</Logo>
+    <Logo>images\windows_installer\app.checksums50x50.png</Logo>
   </Properties>
   <Resources>
     <Resource Language="en-us" />
