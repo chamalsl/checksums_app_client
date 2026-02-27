@@ -1,0 +1,65 @@
+name: Windows MSYS Build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - uses: msys2/setup-msys2@v2
+      with:
+        msystem: ucrt64
+        update: true
+        install: >-
+          mingw-w64-ucrt-x86_64-gtk3
+          mingw-w64-ucrt-x86_64-toolchain
+          base-devel
+          mingw-w64-ucrt-x86_64-openssl
+          mingw-w64-ucrt-x86_64-curl
+          mingw-w64-ucrt-x86_64-gtkmm3
+          mingw-w64-ucrt-x86_64-librsvg
+          mingw-w64-ucrt-x86_64-libsoup3
+
+    - name: Build Application
+      run: |
+        rm resources.cc
+        glib-compile-resources --target=resources.cc --generate-source resources.xml
+        make BUILD=release
+
+    - name: Setup Runtime Dependencies
+      run: |
+        mkdir -p build/release/lib/gdk-pixbuf-2.0/2.10.0/loaders
+        mkdir -p build/release/share/glib-2.0/schemas
+        mkdir -p build/release/share/icons
+        
+        # Copy GTK and dependencies DLLs
+        ldd build/release/checksums.exe | | grep '/ucrt64/bin/' | awk '{print $3}' | xargs -I {} cp {} build/release/ 2>/dev/null || true
+        cp /ucrt64/bin/librsvg-2-2.dll build/release/
+        
+        # Copy pixbuf loaders
+        cp /ucrt64/lib/gdk-pixbuf-2.0/2.10.0/loaders/*.dll build/release/lib/gdk-pixbuf-2.0/2.10.0/loaders/ 2>/dev/null || true
+        cp /ucrt64/lib/gdk-pixbuf-2.0/2.10.0/loaders.cache build/release/lib/gdk-pixbuf-2.0/2.10.0/ 2>/dev/null || true
+        ldd build/release/lib/gdk-pixbuf-2.0/2.10.0/loaders/pixbufloader_svg.dll | grep '/ucrt64/bin/' | awk '{print $3}' | xargs -I {} cp {} build/release/ 2>/dev/null || true
+        
+        # Copy schemas
+        cp /ucrt64/share/glib-2.0/schemas/*.gschema.xml build/release/share/glib-2.0/schemas/ 2>/dev/null || true
+        
+        # Copy icon theme
+        cp -r /ucrt64/share/icons/hicolor build/release/share/icons/ 2>/dev/null || true
+        cp -r /ucrt64/share/icons/Adawita build/release/share/icons/ 2>/dev/null || true
+        
+        # Compile schemas
+        glib-compile-schemas build/release/share/glib-2.0/schemas/
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: checksums-windows
+        path: build/release/
