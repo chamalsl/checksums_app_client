@@ -73,7 +73,7 @@ jobs:
         makeappx pack /d build/release /p build/msix/checksums-app.msix
         
     - name: Upload Artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: checksums-windows
         path: |
