@@ -40,7 +40,7 @@ jobs:
         mkdir -p build/release/share/icons
         
         # Copy GTK and dependencies DLLs
-        ldd build/release/checksums.exe | | grep '/ucrt64/bin/' | awk '{print $3}' | xargs -I {} cp {} build/release/ 2>/dev/null || true
+        ldd build/release/checksums.exe | grep '/ucrt64/bin/' | awk '{print $3}' | xargs -I {} cp {} build/release/ 2>/dev/null || true
         cp /ucrt64/bin/librsvg-2-2.dll build/release/
         
         # Copy pixbuf loaders
