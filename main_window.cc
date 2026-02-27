@@ -317,7 +317,7 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
     result->m_message = result_message;
     COMPLETED;
   }
-  else if (json_obj->arrayItems.size() == 1){
+  else { //json_obj->arrayItems.size() == 1
     Result::RESULT_TYPE result_type;
     JsonObject* file_json = json_obj->arrayItems.at(0).get();
     result->m_message = Api::getResultToDisplay(file_json, local_sha256, local_sha512, result_type);
@@ -325,9 +325,6 @@ std::unique_ptr<Result> verifyFile(Glib::Dispatcher* p_dispatcher, std::string f
     COMPLETED;
   }
 
-  result->m_message = "Unknown Error!";
-  result->m_resultType = Result::RESULT_TYPE::WRONG;
-  COMPLETED;
 }
 
 void MainWindow::onResultReceived()
