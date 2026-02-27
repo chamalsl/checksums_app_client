@@ -70,8 +70,13 @@ jobs:
     - name: Create MSIX Package
       shell: powershell
       run: |
-        echo "Current PATH: $env:Path"
         mkdir -p build/msix
+        $version = (Get-Content VERSION).Trim()
+        $manifestPath = "AppxManifest.xml"
+        [xml]$xml = Get-Content $manifestPath
+        $xml.Package.Identity.Version = $version
+        $xml.Save($manifestPath)
+        Write-Host "Updated manifest to version $version"
         cp AppxManifest.xml build/release
         cp -r images build\release
         makeappx.exe pack /d build/release /p build/msix/checksums-app.msix
