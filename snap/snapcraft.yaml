@@ -49,6 +49,7 @@ parts:
       - make
       - libcurl4-openssl-dev 
       - libgtkmm-3.0-dev
+      - libsoup-3.0-dev
       - libsecret-1-dev
       - libssl-dev
     stage-packages:
@@ -56,17 +57,19 @@ parts:
       - libgtkmm-3.0-1t64
       - libcurl3t64-gnutls
       - libsecret-1-0
+      - libsoup-3.0-0
+      - glib-networking
+      - ca-certificates
       
 apps:
   checksums-app:
-    environment:
-      #LD_LIBRARY_PATH: $LD_LIBRARY_PATH:$SNAP_DESKTOP_RUNTIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/libproxy:$SNAP_DESKTOP_RUNTIME/usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/gio/modules
     command: bin/checksums
     #desktop: snap/gui/app.checksums.desktop
     extensions: [gnome]
     slots: [dbus-app-checksums]
     plugs:
       - network
+      - network-status
       - home
       - desktop
     
