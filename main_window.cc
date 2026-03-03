@@ -36,7 +36,7 @@ MainWindow::MainWindow()
 
   set_position(Gtk::WIN_POS_CENTER);
   set_title("Checksums App");
-  set_default_size(1150,400);
+  set_default_size(1200,600);
   auto css_provider = Gtk::CssProvider::create();
   css_provider->load_from_resource("/css/shasums.css");
   Gtk::StyleContext::add_provider_for_screen(Gdk::Screen::get_default(),css_provider, GTK_STYLE_PROVIDER_PRIORITY_APPLICATION);
