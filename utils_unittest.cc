@@ -30,3 +30,33 @@ TEST(Utils, getDataDirectory){
   expected_path.append("/.local/share/rammini.com/checksums");
   ASSERT_EQ(expected_path, actual);
 }
+
+TEST(Utils, getDateWithMonthAsText){
+  std::string actual = Utils::getDateWithMonthAsText("2012-05-26");
+  std::string expected("2012-May-26");
+  ASSERT_EQ(expected, actual);
+}
+
+TEST(Utils, getDateWithMonthAsEmpty){
+  std::string actual = Utils::getDateWithMonthAsText("");
+  std::string expected("");
+  ASSERT_EQ(expected, actual);
+}
+
+TEST(Utils, getDateWithMonthAsError){
+  std::string actual = Utils::getDateWithMonthAsText("A12-05-26");
+  std::string expected("");
+  ASSERT_EQ(expected, actual);
+}
+
+TEST(Utils, getDateWithMonthAsError_Month){
+  std::string actual = Utils::getDateWithMonthAsText("2012-20-26");
+  std::string expected("");
+  ASSERT_EQ(expected, actual);
+}
+
+TEST(Utils, getDateWithMonthAsError_Day){
+  std::string actual = Utils::getDateWithMonthAsText("2012-05-40");
+  std::string expected("");
+  ASSERT_EQ(expected, actual);
+}

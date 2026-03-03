@@ -113,7 +113,7 @@ std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_fil
       result.append(Glib::Markup::escape_text(version_json->stringValue));
     }     
     result.append("\nRelease date: ");
-    result.append(Glib::Markup::escape_text(release_date_json->stringValue));
+    result.append(Utils::getDateWithMonthAsText(Glib::Markup::escape_text(release_date_json->stringValue)));
   }
 
   std::string not_available_str;

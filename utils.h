@@ -27,6 +27,7 @@ class Utils{
   static bool storeAccessToken(const char* access_token);
   static bool deleteAccessToken();
   static std::string getAccessToken();
+  static std::string getDateWithMonthAsText(std::string date_str);
   static void showError(std::string error_msg);
 
 };

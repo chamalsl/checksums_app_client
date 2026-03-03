@@ -1,5 +1,7 @@
 #include "utils.h"
 #include <iostream>
+#include <iomanip>
+#include <sstream>
 #include <curl/curl.h>
 #include <unistd.h>
 #include <stdlib.h>
@@ -183,6 +185,27 @@ std::unique_ptr<std::string> Utils::getVersion()
   }
 }
 
+std::string Utils::getDateWithMonthAsText(std::string date_str)
+{
+
+  if (date_str.empty()){
+    return "";
+  }
+  
+  std::tm tm_struct = {};
+  std::istringstream ss(date_str);
+  const char* format_input = "%Y-%m-%d";
+  const char* format_output = "%Y-%b-%d";
+  ss >> std::get_time(&tm_struct, format_input);
+  if (ss.fail()) {
+      return "";
+  }
+
+  std::ostringstream oss;
+  oss << std::put_time(&tm_struct, format_output); 
+
+  return oss.str();
+}
 
 void Utils::showError(std::string error_msg)
 {
