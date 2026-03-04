@@ -9,5 +9,5 @@ Dependancies
 1. libcurl
 2. libgtk
 3. OpenSSL
-
+4. libsoup
 

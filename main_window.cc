@@ -58,12 +58,11 @@ MainWindow::MainWindow()
   list_authors.push_back("Chamal De Silva");
   list_authors.push_back("Thanks to these open source software-");
   list_authors.push_back("libgtkmm");
+  list_authors.push_back("libsoup");
   list_authors.push_back("openssl");
   list_authors.push_back("libcurl");
   list_authors.push_back("libsecret");
   m_aboutDialog.set_authors(list_authors);
-
-
 
   m_mainContainer.set_homogeneous(false);
   m_fileNameText.set_width_chars(40);

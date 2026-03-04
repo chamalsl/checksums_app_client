@@ -23,6 +23,7 @@ Application to verify checksums of files.
 2. openssl
 3. libcurl
 4. libsecret
+5. libsoup
 
 * Special thanks to maintainers of above projects
 
