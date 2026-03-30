@@ -12,9 +12,14 @@ summary: Application to calculate and verify SHA-256 and SHA-512 checksums.
 description: |
   This application will calculate SHA-256 and SHA-512 checksums of your file.
   Then verify those checksums with checksums stored at https://checksums.app.
+  
+  https://checksums.app contains a collection of sha256 and sha512 for popular software applications.
+  Please send me an email, if checksums for software that you want to verify is not available.
 
-  Your files will not be uploaded to our server. 
-  Only sha256, sha512 and file name of selected file will be sent to https://checksums.app for verification.
+  Your files will not be uploaded to server. 
+  Only SHA-256, SHA-512 and file name of selected file will be sent to https://checksums.app for verification.
+  
+  Please email me if you encounter any issues, while using this application.
 
 grade: stable #devel 
 confinement: strict #devmode 
@@ -60,7 +65,7 @@ parts:
       - libsoup-3.0-0
       - glib-networking
       - ca-certificates
-      
+
 apps:
   checksums-app:
     command: bin/checksums
