@@ -29,5 +29,6 @@ class Utils{
   static std::string getAccessToken();
   static std::string getDateWithMonthAsText(std::string date_str);
   static void showError(std::string error_msg);
+  static std::string trimString(std::string str);
 
 };

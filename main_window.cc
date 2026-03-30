@@ -14,7 +14,7 @@
 #include <giomm/resource.h>
 #include <libsoup/soup.h>
 
-MainWindow::MainWindow()
+MainWindow::MainWindow(std::unique_ptr<ChecksumsApp::Config> config)
 :m_mainContainer(Gtk::Orientation::ORIENTATION_VERTICAL, 5),
  m_addForm(Gtk::Orientation::ORIENTATION_HORIZONTAL, 5),
  m_lowButtonPanel(Gtk::Orientation::ORIENTATION_HORIZONTAL, 5),
@@ -24,9 +24,9 @@ MainWindow::MainWindow()
  m_showAboutBtn(),
  m_resultImage()
 {
-
   m_pkce = std::make_unique<PKCE>();
   m_soupSession = soup_session_new();
+  m_config = std::move(config);
 
   #if defined(_WIN32) || defined(_WIN64)
   m_os = "Windows";
@@ -105,10 +105,17 @@ MainWindow::MainWindow()
   m_file_dialog->set_modal(true);
   m_file_dialog->signal_response().connect(sigc::mem_fun(*this, &MainWindow::onFileSelected));
 
-  m_apiToken = Utils::getAccessToken();
-  if (!m_apiToken.empty()){
-    m_loginBtn.set_label("Logout");
+  bool loggedIn = m_config->getLoggedIn();
+
+  if (loggedIn) {
+    m_apiToken = Utils::getAccessToken();
+    if (!m_apiToken.empty()){
+      m_loginBtn.set_label("Logout");
+    }
+  }else {
+    m_apiToken = "";
   }
+
 
   m_resultText.set_wrap_mode(Gtk::WrapMode::WRAP_CHAR);
   m_resultText.set_left_margin(15);
@@ -414,6 +421,7 @@ void MainWindow::handleLoginAndLogout()
     if (!status){
       Utils::showError("Could not delete access token.");
     }else{
+      m_config->setValue(ChecksumsApp::LOGGED_IN, "0");
       m_loginBtn.set_label("Login");
       m_apiToken.clear();
     }   
@@ -546,6 +554,7 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
 
       main_window->m_apiToken = api_key_json->stringValue;
       Utils::storeAccessToken(main_window->m_apiToken.c_str());
+      main_window->m_config->setValue(ChecksumsApp::LOGGED_IN, "1");
       main_window->m_loginBtn.set_label("Logout");
       main_window->m_pkceData.completed == true;
       g_bytes_unref(bytes);
@@ -570,6 +579,11 @@ void MainWindow::cancelLoginProcess()
 {
   m_pkceData.reset();
   m_loginBtn.set_sensitive(true);
+}
+
+void MainWindow::setConfig(std::unique_ptr<ChecksumsApp::Config> config)
+{
+  m_config = std::move(config);
 }
 
 MainWindow::~MainWindow(){

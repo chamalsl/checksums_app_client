@@ -4,6 +4,7 @@
 #include "token_window.h"
 #include "result.h"
 #include "pkce.h"
+#include "config.h"
 #include "task_status.h"
 #include "third_party/json_parser/json_parser.h"
 #include <gtkmm.h>
@@ -19,11 +20,12 @@ class TokenWindow;
 class MainWindow: public Gtk::Window {
 
 public:
-  MainWindow();
+  MainWindow(std::unique_ptr<ChecksumsApp::Config> config);
   virtual ~MainWindow();
   void setLoginStatus(int status, std::string apiToken);
   void requestPkceApiKey();
   void cancelLoginProcess();
+  void setConfig(std::unique_ptr<ChecksumsApp::Config> config);
 
 protected:
   void selectFile();
@@ -80,6 +82,7 @@ private:
   Glib::Dispatcher m_Dispatcher;
   std::unique_ptr<std::string> m_version;
   std::unique_ptr<PKCE> m_pkce;
+  std::unique_ptr<ChecksumsApp::Config> m_config;
   SoupSession* m_soupSession = NULL;
   std::future<std::unique_ptr<Result>> m_futureResult;
   std::string m_os = "";

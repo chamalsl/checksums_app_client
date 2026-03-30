@@ -1,5 +1,11 @@
+#include <string>
+#include <map>
+#include <filesystem>
+
 #ifndef CONFIG_H
 #define CONFIG_H
+
+namespace fs = std::filesystem;
 
 namespace ChecksumsApp{
     #ifdef LOCAL_DEV
@@ -21,6 +27,26 @@ namespace ChecksumsApp{
     inline constexpr char const* URL_API_FIND_BY_CHECKSUMS = "https://checksums.app/api/findByChecksums";
     inline constexpr char const* URL_API_FIND_BY_CHECKSUMS_AUTH = "https://checksums.app/api/findByChecksumsPrivate";
     #endif
+
+    inline constexpr char const* LOGGED_IN = "logged-in";
+
+class Config {
+
+    public:
+        Config();
+        bool initialize();
+        std::string  getValue(std::string key);
+        void setValue(std::string key, std::string value);
+        bool getLoggedIn();
+        bool saveConfigFile();
+
+    private:
+        std::map<std::string, std::string> configData;
+        fs::path m_config_file_path;
+        
+        bool createConfigFile();
+};
+
 }
 #endif //CONFIG_H
 

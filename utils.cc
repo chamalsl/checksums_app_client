@@ -214,3 +214,10 @@ void Utils::showError(std::string error_msg)
     gtk_dialog_run(GTK_DIALOG(dialog));
     gtk_widget_destroy(dialog);
 }
+
+std::string Utils::trimString(std::string str)
+{
+  str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
+  str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
+  return str;
+}
