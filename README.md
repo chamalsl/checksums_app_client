@@ -39,6 +39,11 @@ Built executable will be saved in build/{BUILD}/checksums.
 For debug builds, executable will be saved in build/debug/checksums.
 For release builds, executable will be saved in build/release/checksums.
 
+## Run Tests
+1. `make tests` - Build tests.
+2. `build/debug/run_tests` - Run tests.
+
+
 ## Build Snap Package for Development
 1. `export SNAPCRAFT_BUILD_ENVIRONMENT=multipass` - This is required if you have docker installed.
 2. `snapcraft pack --verbose`
