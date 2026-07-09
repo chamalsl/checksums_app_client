@@ -21,7 +21,7 @@ TEST(ApiTest, GetResultToDisplay_1) {
         "\n\nSha 512 : 162b0b32f02482d5aca0a7c93dd03ceac3acd7e410a5f18f3fb990fc958ae0df6f32233b91831eaf99ca581a8c4ddf9c8ba315ac482db6d4ea01cc7884a635be"
         "\n\nSoftware: TestSoft"
         "\nVersion: 1.0.1"
-        "\nRelease date: 2025-05-22";
+        "\nRelease date: 2025-May-22";
 
     Result::RESULT_TYPE result_type;
     std::string local_sha256 = "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7";
@@ -45,7 +45,7 @@ TEST(ApiTest, GetResultToDisplay_2) {
         "\n\nSha 512 : 162b0b32f02482d5aca0a7c93dd03ceac3acd7e410a5f18f3fb990fc958ae0df6f32233b91831eaf99ca581a8c4ddf9c8ba315ac482db6d4ea01cc7884a635be"
         "\n\nSoftware: TestSoft"
         "\nVersion: "
-        "\nRelease date: 2025-05-22"
+        "\nRelease date: 2025-May-22"
         "\n\n<b>* <i>These checksums were not available in our database.</i></b>"
         "\nsha 512";
 
@@ -71,7 +71,7 @@ TEST(ApiTest, GetResultToDisplay_3) {
         "\n\nSha 512 : 162b0b32f02482d5aca0a7c93dd03ceac3acd7e410a5f18f3fb990fc958ae0df6f32233b91831eaf99ca581a8c4ddf9c8ba315ac482db6d4ea01cc7884a635be"
         "\n\nSoftware: TestSoft"
         "\nVersion: "
-        "\nRelease date: 2025-05-22"
+        "\nRelease date: 2025-May-22"
         "\n\n<b>* <i>These checksums were not available in our database.</i></b>"
         "\nsha 256";
 
@@ -100,7 +100,7 @@ TEST(ApiTest, GetResultToDisplay_4) {
         "\n\nSha 512 : f62b0b32f02482d5aca0a7c93dd03ceac3acd7e410a5f18f3fb990fc958ae0df6f32233b91831eaf99ca581a8c4ddf9c8ba315ac482db6d4ea01cc7884a635be"
         "\n\nSoftware: TestSoft"
         "\nVersion: "
-        "\nRelease date: 2025-05-22";
+        "\nRelease date: 2025-May-22";
 
     Result::RESULT_TYPE result_type;
     std::string local_sha256 = "87428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7";
@@ -128,7 +128,7 @@ TEST(ApiTest, GetResultToDisplay_5) {
         "\n\nSha 512 : f62b0b32f02482d5aca0a7c93dd03ceac3acd7e410a5f18f3fb990fc958ae0df6f32233b91831eaf99ca581a8c4ddf9c8ba315ac482db6d4ea01cc7884a635be"
         "\n\nSoftware: TestSoft"
         "\nVersion: "
-        "\nRelease date: 2025-05-22"
+        "\nRelease date: 2025-May-22"
         "\n\n<b>* <i>These checksums were not available in our database.</i></b>"
         "\nsha 256";
 
@@ -158,7 +158,7 @@ TEST(ApiTest, GetResultToDisplay_6) {
         "\n\nSha 256 : f7428fc522803d31065e7bce3cf03fe475096631e5e07bbd7a0fde60c4cf25c7"
         "\n\nSoftware: TestSoft"
         "\nVersion: "
-        "\nRelease date: 2025-05-22"
+        "\nRelease date: 2025-May-22"
         "\n\n<b>* <i>These checksums were not available in our database.</i></b>"
         "\nsha 512";
 
