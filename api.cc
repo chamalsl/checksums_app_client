@@ -6,7 +6,20 @@
 #include <map>
 #include <glibmm/markup.h>
 
-std::pair<short, std::string>  Api::findByFileName(std::string file_name, std::string apiToken)
+std::pair<short, std::string> Api::sendContactUsMessage(std::string name, std::string email, std::string subject, std::string body)
+{
+    std::string url = ChecksumsApp::URL_API_SEND_CONTACT_US;
+    std::map<std::string, std::string> post_data;
+    post_data["name"] = name;
+    post_data["email"] = email;
+    post_data["subject"] = subject;
+    post_data["message"] = body;
+    std::map<std::string, std::string> headers;
+    headers["Accept"] = "application/json";
+    return Utils::requestURLWithPost(url, post_data, "", headers);
+}
+
+std::pair<short, std::string> Api::findByFileName(std::string file_name, std::string apiToken)
 {
   std::string url = ChecksumsApp::URL_API_FIND_BY_NAME;
   if (!apiToken.empty()){

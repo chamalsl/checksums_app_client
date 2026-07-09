@@ -1,7 +1,7 @@
 #include <string>
 #include <memory>
 #include <map>
-
+#include <gtkmm.h>
 
 static const std::string SECRET_STORE_SCHEMA_APPLICATION = "Application";
 static const std::string SECRET_STORE_SCHEMA_URL = "URL";
@@ -29,6 +29,8 @@ class Utils{
   static std::string getAccessToken();
   static std::string getDateWithMonthAsText(std::string date_str);
   static void showError(std::string error_msg);
+  static void showMessage(std::string msg, GtkMessageType p_type);
   static std::string trimString(std::string str);
+  static bool isValidEmail(std::string p_email);
 
 };

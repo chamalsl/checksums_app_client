@@ -9,7 +9,7 @@ namespace fs = std::filesystem;
 ChecksumsApp::Config::Config()
 {
     m_config_file_path = fs::path(Utils::getDataDirectory()) / "checksums-app.conf";
-    std::cout << "Data Directory " << m_config_file_path.string() << "\n";
+    //std::cout << "Data Directory " << m_config_file_path.string() << "\n";
 }
 
 bool ChecksumsApp::Config::initialize()

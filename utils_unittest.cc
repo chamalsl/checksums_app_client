@@ -60,3 +60,44 @@ TEST(Utils, getDateWithMonthAsError_Day){
   std::string expected("");
   ASSERT_EQ(expected, actual);
 }
+
+TEST(Utils, isValidEmail_ValidSimple){
+  ASSERT_TRUE(Utils::isValidEmail("user@example.com"));
+}
+
+TEST(Utils, isValidEmail_ValidSubdomain){
+  ASSERT_TRUE(Utils::isValidEmail("user@mail.example.co.uk"));
+}
+
+TEST(Utils, isValidEmail_InValidSubdomain_LessThanTwo){
+  ASSERT_FALSE(Utils::isValidEmail("user@mail.example.co.u"));
+}
+
+TEST(Utils, isValidEmail_InvalidNoAt){
+  ASSERT_FALSE(Utils::isValidEmail("userexample.com"));
+}
+
+TEST(Utils, isValidEmail_InvalidMultipleAt){
+  ASSERT_FALSE(Utils::isValidEmail("user@@example.com"));
+}
+
+TEST(Utils, isValidEmail_InvalidLeadingDotLocal){
+  ASSERT_FALSE(Utils::isValidEmail(".user@example.com"));
+}
+
+TEST(Utils, isValidEmail_InvalidTrailingDotDomain){
+  ASSERT_FALSE(Utils::isValidEmail("user@example.com."));
+}
+
+TEST(Utils, isValidEmail_ValidPlusAddressing){
+  ASSERT_TRUE(Utils::isValidEmail("user+tag@example.com"));
+}
+
+TEST(Utils, isValidEmail_InvalidEmpty){
+  ASSERT_FALSE(Utils::isValidEmail(""));
+}
+
+TEST(Utils, isValidEmail_InvalidSpace){
+  ASSERT_FALSE(Utils::isValidEmail("user @example.com"));
+}
+

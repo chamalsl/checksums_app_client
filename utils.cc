@@ -116,6 +116,7 @@ std::string Utils::requestURL(std::string p_url)
   return data;
 }
 
+
 std::pair<short, std::string> Utils::requestURLWithPost(std::string p_url, std::map<std::string, std::string> p_post_data,
     std::string token, std::map<std::string, std::string> headers)
 {
@@ -126,10 +127,11 @@ std::pair<short, std::string> Utils::requestURLWithPost(std::string p_url, std::
   for (auto const& val: p_post_data){
     curl_mimepart *part = curl_mime_addpart(post_data);
     curl_mime_name(part, val.first.c_str());
-    curl_mime_data(part, curl_easy_escape(curl_conn, val.second.c_str(), val.second.length()), CURL_ZERO_TERMINATED);
+    curl_mime_data(part, val.second.c_str(), CURL_ZERO_TERMINATED);
   }  
 
   curl_easy_setopt(curl_conn, CURLOPT_URL, url);
+
   curl_easy_setopt(curl_conn, CURLOPT_MIMEPOST, post_data);
   curl_easy_setopt(curl_conn, CURLOPT_TIMEOUT, 10L);
   curl_easy_setopt(curl_conn, CURLOPT_SSL_OPTIONS, CURLSSLOPT_NATIVE_CA);
@@ -215,9 +217,70 @@ void Utils::showError(std::string error_msg)
     gtk_widget_destroy(dialog);
 }
 
+void Utils::showMessage(std::string msg, GtkMessageType p_type)
+{
+    GtkDialogFlags flags = GTK_DIALOG_DESTROY_WITH_PARENT;
+    GtkWidget* dialog = gtk_message_dialog_new(NULL, flags, p_type, GTK_BUTTONS_CLOSE, "%s",msg.c_str());
+    gtk_dialog_run(GTK_DIALOG(dialog));
+    gtk_widget_destroy(dialog);
+}
+
+
 std::string Utils::trimString(std::string str)
 {
   str.erase(0, str.find_first_not_of(" \t\n\r\f\v"));
   str.erase(str.find_last_not_of(" \t\n\r\f\v") + 1);
   return str;
+}
+
+bool Utils::isValidEmail(std::string p_email)
+{
+  if (p_email.empty()) {
+    return false;
+  }
+
+  size_t at_pos = p_email.find('@');
+  if (at_pos == std::string::npos || at_pos == 0 || at_pos == p_email.length() - 1) {
+    return false;
+  }
+
+  if (p_email.find('@', at_pos + 1) != std::string::npos) {
+    return false;
+  }
+
+  std::string local_part = p_email.substr(0, at_pos);
+  std::string domain_part = p_email.substr(at_pos + 1);
+
+  if (local_part.empty() || domain_part.empty()) {
+    return false;
+  }
+
+  size_t dot_pos_local_part = local_part.find('.');
+  if (dot_pos_local_part == 0 || dot_pos_local_part == local_part.length()-1){
+    return false;
+  }
+
+  size_t dot_pos_domain_part = domain_part.rfind('.');
+  if (dot_pos_domain_part == std::string::npos || dot_pos_domain_part == 0 || dot_pos_domain_part == domain_part.length() - 1) {
+    return false;
+  }
+
+  if (domain_part.length() - 1 - dot_pos_domain_part < 2) {
+      return false; 
+  }
+
+
+  for (char c : local_part) {
+    if (!std::isalnum(c) && c != '.' && c != '_' && c != '-' && c != '+') {
+      return false;
+    }
+  }
+
+  for (char c : domain_part) {
+    if (!std::isalnum(c) && c != '.' && c != '-') {
+      return false;
+    }
+  }
+
+  return true;
 }

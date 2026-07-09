@@ -2,6 +2,7 @@
 #define MAINWINDOW_H
 
 #include "token_window.h"
+#include "contactus_window.h"
 #include "result.h"
 #include "pkce.h"
 #include "config.h"
@@ -40,9 +41,11 @@ protected:
   Gtk::ProgressBar m_progressBar;
   Gtk::Box m_lowButtonPanel;
   Gtk::AboutDialog m_aboutDialog;
+  Gtk::Button m_contactBtn;
   Gtk::Button m_showAboutBtn;
   Gtk::VBox m_mainContainer;
   TokenWindow* m_loginWindow;
+  ContacUsWindow* m_contactUsWindow;
   
 private:
   void startVerifying();
@@ -51,6 +54,7 @@ private:
   void displayResult(std::string message, Result::RESULT_TYPE result);
   void enableButtons(bool enable);
   void showAbout();
+  void showContactUs();
   static void handlePkceChallengeResponse(GObject* source, GAsyncResult* res, gpointer user_data);
   static void handleRequestPkceApiKeyResponse(GObject* source, GAsyncResult* res, gpointer user_data);
   std::string m_file_path;

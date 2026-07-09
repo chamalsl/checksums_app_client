@@ -10,7 +10,10 @@
   <gresource prefix="/data">
     <file>VERSION</file>
   </gresource>
-    <gresource prefix="/css">
+  <gresource prefix="/css">
     <file>shasums.css</file>
+  </gresource>
+  <gresource prefix="/ui">
+    <file>contact.ui</file>
   </gresource>
 </gresources>

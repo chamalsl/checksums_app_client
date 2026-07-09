@@ -21,12 +21,14 @@ MainWindow::MainWindow(std::unique_ptr<ChecksumsApp::Config> config)
  m_browseBtn("Browse"),
  m_checkBtn("Check"),
  m_loginBtn("Login"),
+ m_contactBtn(),
  m_showAboutBtn(),
  m_resultImage()
 {
   m_pkce = std::make_unique<PKCE>();
   m_soupSession = soup_session_new();
   m_config = std::move(config);
+  m_contactUsWindow = new ContacUsWindow();
 
   #if defined(_WIN32) || defined(_WIN64)
   m_os = "Windows";
@@ -78,18 +80,21 @@ MainWindow::MainWindow(std::unique_ptr<ChecksumsApp::Config> config)
   m_addForm.set_valign(Gtk::ALIGN_BASELINE);
   m_mainContainer.set_valign(Gtk::ALIGN_FILL);
   m_mainContainer.pack_start(m_resultText, true, true, 5);
+  m_contactBtn.set_image_from_icon_name("mail-message-new");
   m_showAboutBtn.set_image_from_icon_name("help-about");
   m_progressBar.set_show_text(true);
   m_progressBar.set_halign(Gtk::Align::ALIGN_CENTER);
   m_progressBar.set_valign(Gtk::Align::ALIGN_CENTER);
   m_lowButtonPanel.pack_start(m_progressBar, false, false, 5);
   m_lowButtonPanel.pack_end(m_showAboutBtn, false, false, 5);
+  m_lowButtonPanel.pack_end(m_contactBtn, false, false, 5);
   m_mainContainer.pack_end(m_lowButtonPanel, false, false, 5);
   add(m_mainContainer);
   m_progressBar.set_no_show_all(true);
   m_progressBar.set_visible(false);
 
   m_showAboutBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::showAbout));
+  m_contactBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::showContactUs));
   m_browseBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::selectFile));
   m_checkBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::startVerifying));
   m_loginBtn.signal_clicked().connect(sigc::mem_fun(*this, &MainWindow::handleLoginAndLogout));
@@ -460,6 +465,13 @@ void MainWindow::showAbout()
   m_aboutDialog.present();
 }
 
+void MainWindow::showContactUs()
+{
+  m_contactUsWindow->showWindow(*this);
+}
+
+
+
 void MainWindow::handlePkceChallengeResponse(GObject* source, GAsyncResult* res, gpointer user_data)
 {
   MainWindow* main_window = static_cast<MainWindow*>(user_data);
@@ -591,6 +603,7 @@ MainWindow::~MainWindow(){
     g_object_unref(m_soupSession);
   }
   delete m_loginWindow;
+  delete m_contactUsWindow;
 }
 
 void MainWindow::setLoginStatus(int status, std::string apiToken)

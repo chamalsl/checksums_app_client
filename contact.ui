@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="contact_window">
+    <property name="title">Contact Us</property>
+    <property name="default_width">480</property>
+    <property name="default_height">320</property>
+    <property name="resizable">False</property>
+    <property name="modal">True</property>
+    <child>
+      <object class="GtkBox" id="main_box">
+        <property name="orientation">vertical</property>
+        <property name="spacing">12</property>
+        <property name="margin_top">12</property>
+        <property name="margin_bottom">12</property>
+        <property name="margin_start">12</property>
+        <property name="margin_end">12</property>
+        <child>
+          <object class="GtkGrid" id="form_grid">
+            <property name="row_spacing">8</property>
+            <property name="column_spacing">12</property>
+            <property name="column_homogeneous">False</property>
+            <child>
+              <object class="GtkLabel" id="name_label">
+                <property name="label">Name (Optional):</property>
+                <property name="halign">end</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="name_entry">
+                <property name="hexpand">True</property>
+                <property name="max-length">50</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">0</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="email_label">
+                <property name="label">Email (Optional):</property>
+                <property name="halign">end</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="email_entry">
+                <property name="hexpand">True</property>
+                <property name="max-length">100</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">1</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="subject_label">
+                <property name="label">Subject:</property>
+                <property name="halign">end</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkEntry" id="subject_entry">
+                <property name="hexpand">True</property>
+                <property name="max-length">200</property>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">2</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkLabel" id="message_label">
+                <property name="label">Message:</property>
+                <property name="halign">end</property>
+                <property name="valign">start</property>
+              </object>
+              <packing>
+                <property name="left_attach">0</property>
+                <property name="top_attach">3</property>
+              </packing>
+            </child>
+            <child>
+              <object class="GtkScrolledWindow" id="message_scroll">
+                <property name="hexpand">True</property>
+                <property name="vexpand">True</property>
+                <child>
+                  <object class="GtkTextView" id="message_entry">
+                    <property name="wrap_mode">word</property>
+                  </object>
+                </child>
+              </object>
+              <packing>
+                <property name="left_attach">1</property>
+                <property name="top_attach">3</property>
+                <property name="width">1</property>
+                <property name="height">2</property>
+              </packing>
+            </child>
+          </object>
+        </child>
+        <child>
+          <object class="GtkButtonBox" id="action_button_box">
+            <property name="layout_style">end</property>
+            <property name="spacing">8</property>
+            <child>
+              <object class="GtkButton" id="cancel_button">
+                <property name="label">Close</property>
+              </object>
+            </child>
+            <child>
+              <object class="GtkButton" id="send_button">
+                <property name="label">Send</property>
+                <property name="can_default">True</property>
+              </object>
+            </child>
+          </object>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
