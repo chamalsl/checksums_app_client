@@ -5,4 +5,4 @@
 **/*.snap
 **/*.deb
 **/*.code-workspace
-
+resources.cc
