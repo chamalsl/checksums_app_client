@@ -8,3 +8,14 @@
 #user_code{ 
     font-size: 32px; 
 }
+
+.contact_us_button_attention {
+    border: 2px solid;
+    border-radius: 6px;
+}
+
+
+.contact_us_scrolled_window {
+    border: 2px solid;
+    border-radius: 6px;
+}
