@@ -3,8 +3,8 @@
   <requires lib="gtk+" version="3.20"/>
   <object class="GtkWindow" id="contact_window">
     <property name="title">Contact Us</property>
-    <property name="default_width">480</property>
-    <property name="default_height">320</property>
+    <property name="default_width">600</property>
+    <property name="default_height">450</property>
     <property name="resizable">False</property>
     <property name="modal">True</property>
     <child>
@@ -94,6 +94,9 @@
             <child>
               <object class="GtkScrolledWindow" id="message_scroll">
                 <property name="hexpand">True</property>
+                <style>
+                  <class name="contact_us_scrolled_window"/>
+                </style>
                 <property name="vexpand">True</property>
                 <child>
                   <object class="GtkTextView" id="message_entry">
