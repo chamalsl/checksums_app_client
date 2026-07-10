@@ -6,8 +6,11 @@ class ContacUsWindow {
         void sendMessage();
         void cancelMessage();
         bool showWindow(Gtk::Window &p_parent);
+        void setDefaultValuesToRequestNewSoftware();
 
     private:
+
+        void init();
         Gtk::Window* m_contactWindow = NULL;
         Gtk::Entry* m_nameTxt;
         Gtk::Entry* m_emailTxt;
@@ -16,4 +19,7 @@ class ContacUsWindow {
         Gtk::Button* m_sendBtn;
         Gtk::Button* m_cancelBtn;
         Gtk::Button* m_loginBtn;
+        bool showAllCalled = false;
+
+
 };
