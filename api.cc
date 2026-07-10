@@ -51,7 +51,11 @@ std::pair<short, std::string>  Api::findByChecksums(std::string sha256, std::str
 std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_file_sha256, std::string local_file_sha512,
                                     Result::RESULT_TYPE &result_type)
 {
-  bool matched = false;
+  bool sha512_matched = false;
+  bool sha256_matched = false;
+  bool verification_failed = false;
+  std::string invalid_response = "Invalid response from server received!";
+
   std::string result;
   JsonObject* remote_sha256_json = JsonParser::findByPropertyName(file_json, "sha256sum");
   JsonObject* remote_sha512_json = JsonParser::findByPropertyName(file_json, "sha512sum");
@@ -61,15 +65,22 @@ std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_fil
   JsonObject* file_name_json = JsonParser::findByPropertyName(file_json, "file_name");
   JsonObject* public_json = JsonParser::findByPropertyName(file_json, "public");
   if (!remote_sha256_json || !remote_sha512_json || !public_json || !file_name_json){
-    return "";
+    result_type = Result::RESULT_TYPE::WRONG;
+    return invalid_response;
   }
 
   if (public_json->integerValue == 1 && !software_name_json){
-    return "";
+    result_type = Result::RESULT_TYPE::WRONG;
+    return invalid_response;
   }
 
   std::string remote_sha256sum = remote_sha256_json->stringValue;
   std::string remote_sha512sum = remote_sha512_json->stringValue;
+
+  if (remote_sha256sum.empty() && remote_sha512sum.empty()){
+    result_type = Result::RESULT_TYPE::WRONG;
+    return invalid_response;
+  }
   
   std::transform(remote_sha256sum.begin(), remote_sha256sum.end(), remote_sha256sum.begin(), static_cast<int(*)(int)>(std::tolower));
   std::transform(remote_sha512sum.begin(), remote_sha512sum.end(), remote_sha512sum.begin(), static_cast<int(*)(int)>(std::tolower));
@@ -81,19 +92,30 @@ std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_fil
   }
   result.append("\n");
 
-  if (local_file_sha512 == remote_sha512sum){
-    matched = true;
-    result.append("\nSha512 matched!");
+  std::string matched_checksums = "";
+  if (!remote_sha512sum.empty()) {
+    if (local_file_sha512 == remote_sha512sum){
+      sha512_matched = true;
+      matched_checksums.append("\nSha512 matched!");
+    }else {
+      verification_failed = true;
+    }
   }
   
-  if (local_file_sha256 == remote_sha256sum){
-    matched = true;
-    result.append("\nSha256 matched!");
+  if (!remote_sha256sum.empty()) {
+    if (local_file_sha256 == remote_sha256sum){
+      sha256_matched = true;
+      matched_checksums.append("\nSha256 matched!");
+    }else {
+      verification_failed = true;
+    }
   }
-  if (!matched) {
+
+  if (verification_failed) {
     result.append("\nChecksums <b>DID NOT</b> match!");
     result_type = Result::RESULT_TYPE::WRONG;
   }else{
+    result.append(matched_checksums);
     result_type = Result::RESULT_TYPE::CORRECT;
   }
 
@@ -105,16 +127,28 @@ std::string Api::getResultToDisplay(JsonObject *file_json, std::string local_fil
   result.append("\n\nSha 512 : ");
   result.append(local_file_sha512);
 
-  if (!matched) {
+  if (verification_failed) {
     result.append("\n\n<b><u>Checksums in our Database</u></b>");
     if (!remote_sha256sum.empty()){
       result.append("\n\nSha 256 : ");
+      if (!sha256_matched){
+        result.append("<span foreground='red'>");
+      }
       result.append(Glib::Markup::escape_text(remote_sha256sum));
+      if (!sha256_matched){
+        result.append("</span>");
+      }
     }
 
     if (!remote_sha512sum.empty()){
       result.append("\n\nSha 512 : ");
+      if (!sha512_matched){
+        result.append("<span foreground='red'>");
+      }
       result.append(Glib::Markup::escape_text(remote_sha512sum));
+      if (!sha512_matched){
+        result.append("</span>");
+      }
     }
   }
   
