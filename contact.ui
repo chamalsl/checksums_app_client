@@ -101,6 +101,9 @@
                 <child>
                   <object class="GtkTextView" id="message_entry">
                     <property name="wrap_mode">word</property>
+                    <style>
+                      <class name="contact_us_message_text"/>
+                    </style>
                   </object>
                 </child>
               </object>
