@@ -68,3 +68,4 @@ clean:
 	rm ${BUILD_DIR}*.o 
 	rm ${BUILD_DIR}third_party/json_parser/*.o
 	rm ${BUILD_DIR}checksums
+	rm ${BUILD_DIR}run_tests
