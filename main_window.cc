@@ -446,6 +446,8 @@ void MainWindow::displayResult(std::string message, Result::RESULT_TYPE result_t
     m_resultImage.set(m_wrong);
   }
   else if (result_type == Result::RESULT_TYPE::WARNING) {
+    auto contactBtnStyleContext = m_contactBtn.get_style_context();
+    contactBtnStyleContext->add_class("contact_us_button_attention");
     m_resultImage.set(m_warning);
   }
   else{
