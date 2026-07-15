@@ -449,6 +449,17 @@ void MainWindow::displayResult(std::string message, Result::RESULT_TYPE result_t
     auto contactBtnStyleContext = m_contactBtn.get_style_context();
     contactBtnStyleContext->add_class("contact_us_button_attention");
     m_contactUsWindow->setDefaultValuesToRequestNewSoftware();
+
+    if (m_config->getAttentionRequestData()) {
+      std::string request_software_message = "\n\n\n\n<span foreground='blue'> "
+                                             "If the software you want to verify is not available in checksums.app, "
+                                             "you can submit a request to have it added. Please click the <b>Contact Us</b> button below to send your request."
+                                             "</span>";
+
+                                             
+      text_buffer->insert_markup(text_buffer->end() ,request_software_message);
+      m_config->setValue(ChecksumsApp::ATTENTION_REQUEST_SOFTWARE,"0");
+    }
     m_resultImage.set(m_warning);
   }
   else{

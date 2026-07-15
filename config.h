@@ -29,6 +29,7 @@ namespace ChecksumsApp{
     #endif
 
     inline constexpr char const* LOGGED_IN = "logged-in";
+    inline constexpr char const* ATTENTION_REQUEST_SOFTWARE = "attention_request_software";
 
 class Config {
 
@@ -36,8 +37,12 @@ class Config {
         Config();
         bool initialize();
         std::string  getValue(std::string key);
+        bool  getValueBoolean(std::string key, std::string defaultValue);
+        std::string  getValue(std::string key, std::string defaultValue);
         void setValue(std::string key, std::string value);
         bool getLoggedIn();
+        bool getAttentionRequestData();
+        bool keyExist(std::string key);
         bool saveConfigFile();
 
     private:

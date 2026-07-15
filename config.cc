@@ -66,19 +66,9 @@ std::string ChecksumsApp::Config::getValue(std::string key)
     return "";
 }
 
-void ChecksumsApp::Config::setValue(std::string key, std::string value)
+bool ChecksumsApp::Config::getValueBoolean(std::string key, std::string defaultValue)
 {
-    configData[key] = value;
-    saveConfigFile();
-}
-
-bool ChecksumsApp::Config::getLoggedIn()
-{
-    std::string value = getValue(ChecksumsApp::LOGGED_IN);
-
-    if (value.empty()) {
-        return false;
-    }
+    std::string value = getValue(key, defaultValue);
 
     try {
         int num = std::stoi(value);
@@ -92,6 +82,38 @@ bool ChecksumsApp::Config::getLoggedIn()
     } catch (const std::out_of_range& e) {
         return false;
     }
+}
+
+std::string ChecksumsApp::Config::getValue(std::string key, std::string defaultValue)
+{
+    if (configData.find(key) == configData.end()) {
+        configData[key] = defaultValue;
+    }
+    return configData[key];
+}
+
+void ChecksumsApp::Config::setValue(std::string key, std::string value)
+{
+    configData[key] = value;
+    saveConfigFile();
+}
+
+bool ChecksumsApp::Config::getLoggedIn()
+{
+    return getValueBoolean(ChecksumsApp::LOGGED_IN, "0");
+}
+
+bool ChecksumsApp::Config::getAttentionRequestData()
+{
+    return getValueBoolean(ChecksumsApp::ATTENTION_REQUEST_SOFTWARE,"1");
+}
+
+bool ChecksumsApp::Config::keyExist(std::string key)
+{
+    if (configData.find(key) != configData.end()){
+        return true;
+    }
+    return false;
 }
 
 bool ChecksumsApp::Config::saveConfigFile()
@@ -112,12 +134,16 @@ bool ChecksumsApp::Config::saveConfigFile()
 bool ChecksumsApp::Config::createConfigFile()
 {
     fs::path parent_folders = m_config_file_path.parent_path();
-    bool created = fs::create_directories(parent_folders);
 
-    if (!created) {
-        std::cout << "Could not create parent directories for configuration file\n";
+    std::error_code ec;
+    fs::create_directories(parent_folders, ec);
+
+    if (ec) {
+        std::cout << "Could not create parent directories for configuration file: " << ec.message() << "\n";
         return false;
     }
+
+
 
     std::ofstream file(m_config_file_path, std::ios::out);
     if (!file.is_open()){
