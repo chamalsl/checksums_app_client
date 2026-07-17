@@ -19,7 +19,15 @@ jobs:
       run: |
         sudo apt update
         sudo DEBIAN_FRONTEND=noninteractive apt -y install tzdata
-        sudo apt -y install libgtkmm-3.0-dev libcurl4-openssl-dev libsecret-1-dev libsoup-3.0-dev libgtest-dev
+        sudo apt -y install libgtkmm-3.0-dev libcurl4-openssl-dev libsecret-1-dev libsoup-3.0-dev libgtest-dev cmake
+    - name: Build Google Test framework
+      run: |
+        cd /usr/src/gtest
+        sudo mkdir build 
+        cd build
+        sudo cmake ..
+        sudo make
+        sudo cp lib/libgtest.a /usr/local/lib/
     - name: tests
       run: |
         glib-compile-resources --target=resources.cc --generate-source resources.xml
