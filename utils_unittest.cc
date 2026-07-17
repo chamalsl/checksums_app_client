@@ -4,6 +4,10 @@
 #include <string>
 
 TEST(Utils, getHomeDirectory){
+  if (std::getenv("GITHUB_ACTIONS") != nullptr) {
+    GTEST_SKIP() << "Skipping getlogin test in GitHub Actions environment";
+  }
+
   std::string home_dir = Utils::getHomeDirectory();
   char* user = getlogin();
   std::string expected_path("/home/");
@@ -12,6 +16,10 @@ TEST(Utils, getHomeDirectory){
 }
 
 TEST(Utils, getHomeDirectory_getpwuid){
+  if (std::getenv("GITHUB_ACTIONS") != nullptr) {
+    GTEST_SKIP() << "Skipping getlogin test in GitHub Actions environment";
+  }
+
   char* home_env= getenv("HOME");
   unsetenv("HOME");
   std::string home_dir = Utils::getHomeDirectory();
@@ -23,6 +31,10 @@ TEST(Utils, getHomeDirectory_getpwuid){
 }
 
 TEST(Utils, getDataDirectory){
+  if (std::getenv("GITHUB_ACTIONS") != nullptr) {
+    GTEST_SKIP() << "Skipping getlogin test in GitHub Actions environment";
+  }
+
   std::string actual = Utils::getDataDirectory();
   char* user = getlogin();
   std::string expected_path("/home/");
