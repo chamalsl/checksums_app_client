@@ -47,57 +47,27 @@ bool Utils::deleteAccessToken()
     return removed;
 }
 
-std::string Utils::getAccessToken()
-{
+
+std::string Utils::getAccessToken(){
+
     GError *error = NULL;
+    gchar *access_token = secret_password_lookup_sync (getSecretStoreSchema(), NULL, &error,
+                                                SECRET_STORE_SCHEMA_APPLICATION.c_str(), SECRET_STORE_APP_NAME.c_str(),
+                                                SECRET_STORE_SCHEMA_URL.c_str(), SECRET_STORE_APP_URL.c_str(),NULL);
+    std::string access_token_str = "";
 
-    SecretService* service = secret_service_get_sync(SECRET_SERVICE_NONE, nullptr, &error);
-    if (error != nullptr) {
-        std::cerr << "Failed to create secret service: " << error->message << std::endl;
-        g_error_free(error);
-        return "";
-    }
+    if (error != NULL) {
+        g_error_free (error);
+    } 
 
-    /* Attributes to search for */
-    GHashTable *attrs = g_hash_table_new(g_str_hash, g_str_equal);
-    g_hash_table_insert(attrs, (gpointer)SECRET_STORE_SCHEMA_APPLICATION.c_str(), (gpointer)SECRET_STORE_APP_NAME.c_str());
-    g_hash_table_insert(attrs, (gpointer)SECRET_STORE_SCHEMA_URL.c_str(),  (gpointer)SECRET_STORE_APP_URL.c_str());
+    if (access_token != NULL) {
+        access_token_str.append(access_token);
+    } 
 
-    GList *items = secret_service_search_sync(
-        service,
-        getSecretStoreSchema(), 
-        attrs,
-        static_cast<SecretSearchFlags>(SECRET_SEARCH_UNLOCK | SECRET_SEARCH_LOAD_SECRETS | SECRET_SEARCH_ALL), 
-        NULL,
-        &error);
-
-    if (error) {
-        std::cerr << "Secret store search failed: " << error->message << "\n";
-        g_error_free(error);
-        return "";
-    }
-
-    if (items == NULL || g_list_length(items) == 0){
-        std::cerr << "Secret store did not return any results.\n";
-        return "";
-    }
-    
-    if (g_list_length(items) > 1){
-        std::cerr << "Secret store returned more than one item.\n";
-        return "";
-    }
-
-    GList *first_node = g_list_first(items);
-    SecretItem *item = SECRET_ITEM(first_node->data);
-    SecretValue *value = secret_item_get_secret(item);
-    const gchar* secret_char = secret_value_get_text(value);
-    std::string access_token_str = secret_char? secret_char: "";
-
-    g_hash_table_unref(attrs);
-    g_list_free_full(items, g_object_unref);
-    
     return access_token_str;
 }
+
+
 
 /*
   Unlocks default secret collection if it is locked.
