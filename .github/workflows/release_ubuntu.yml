@@ -14,7 +14,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
     - name: Install dependancies
       run: |
         sudo apt update
@@ -22,12 +22,12 @@ jobs:
         sudo apt -y install libgtkmm-3.0-dev libcurl4-openssl-dev libsecret-1-dev libsoup-3.0-dev libgtest-dev
     - name: tests
       run: |
+        glib-compile-resources --target=resources.cc --generate-source resources.xml
         make BUILD=release tests
         build/release/run_tests
     - name: make
       run: |
         make BUILD=release clean
-        rm resources.cc
         glib-compile-resources --target=resources.cc --generate-source resources.xml
         make BUILD=release
     - name: make_deb
