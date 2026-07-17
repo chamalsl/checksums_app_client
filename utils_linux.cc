@@ -106,6 +106,14 @@ bool Utils::unlockSecretServiceDefaultCollection()
 {
     GError *error = nullptr;
 
+    /*
+    If application is running inside snap sandbox, then application cannot unlock system's default collection.
+    It is also not necessary, when application is running as snap.
+    */
+    if (std::getenv("SNAP")){
+        return true;
+    }
+
     // 1. Get the Secret Service instance
     SecretService *service = secret_service_get_sync(SECRET_SERVICE_NONE, nullptr, &error);
     if (error != nullptr) {
