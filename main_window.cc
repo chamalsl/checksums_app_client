@@ -113,10 +113,16 @@ MainWindow::MainWindow(std::unique_ptr<ChecksumsApp::Config> config)
   bool loggedIn = m_config->getLoggedIn();
 
   if (loggedIn) {
-    m_apiToken = Utils::getAccessToken();
-    if (!m_apiToken.empty()){
-      m_loginBtn.set_label("Logout");
+    if (Utils::unlockSecretServiceDefaultCollection()) {
+      m_apiToken = Utils::getAccessToken();
+      if (!m_apiToken.empty()){
+        m_loginBtn.set_label("Logout");
+      }
+    } else {
+      Utils::showError("Could not unlock secrets storage!");
+      m_apiToken = "";
     }
+
   }else {
     m_apiToken = "";
   }

@@ -32,5 +32,6 @@ class Utils{
   static void showMessage(std::string msg, GtkMessageType p_type);
   static std::string trimString(std::string str);
   static bool isValidEmail(std::string p_email);
+  static bool unlockSecretServiceDefaultCollection(); 
 
 };
