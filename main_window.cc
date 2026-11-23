@@ -27,6 +27,7 @@ MainWindow::MainWindow(std::unique_ptr<ChecksumsApp::Config> config)
 {
   m_pkce = std::make_unique<PKCE>();
   m_soupSession = soup_session_new();
+  soup_session_set_timeout(m_soupSession, 10);
   m_config = std::move(config);
   m_contactUsWindow = new ContacUsWindow();
 
@@ -411,10 +412,49 @@ void MainWindow::onFileSelected(int response_id)
 
 }
 
+void MainWindow::showLoginProgress()
+{
+  if (login_progress_dialog) {
+    login_progress_dialog->present();
+    return;
+  }
+
+  login_progress_dialog = new Gtk::Dialog();
+  login_progress_dialog->set_transient_for(*this);
+  login_progress_dialog->set_modal(true);
+  login_progress_dialog->set_decorated(false);
+  login_progress_dialog->set_position(Gtk::WIN_POS_CENTER_ON_PARENT);
+  login_progress_dialog->set_border_width(20);
+
+  Gtk::Box* content = login_progress_dialog->get_content_area();
+  content->set_orientation(Gtk::ORIENTATION_HORIZONTAL);
+  content->set_spacing(12);
+
+  Gtk::Spinner* spinner = Gtk::manage(new Gtk::Spinner());
+  spinner->start();
+  Gtk::Label* label = Gtk::manage(new Gtk::Label("Loggin in .."));
+  content->pack_start(*spinner, false, false, 0);
+  content->pack_start(*label, false, false, 0);
+  login_progress_dialog->show_all();
+  login_progress_dialog->present();
+}
+
+void MainWindow::closeLoginProgress()
+{
+  if (!login_progress_dialog) {
+    return;
+  }
+
+  login_progress_dialog->hide();
+}
+
+
 void MainWindow::handleLoginAndLogout()
 {
   if (m_apiToken.empty()) {
     m_loginBtn.set_sensitive(false);
+    showLoginProgress();
+
     m_pkceData.reset();
     m_pkceData.code_verifier = m_pkce->getCodeVerifier();
     m_pkceData.code_verifier_sha256 = m_pkce->getCodeVerifierSha256( m_pkceData.code_verifier);
@@ -499,6 +539,7 @@ void MainWindow::handlePkceChallengeResponse(GObject* source, GAsyncResult* res,
   GError* error = NULL;
   GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
 
+  main_window->closeLoginProgress();
   if (error) {
       std::string error_str = "";
       error_str.append(error->message);
@@ -549,7 +590,6 @@ void MainWindow::handleRequestPkceApiKeyResponse(GObject *source, GAsyncResult *
   SoupSession *session = SOUP_SESSION (source);
   GError* error = NULL;
   GBytes* bytes = soup_session_send_and_read_finish(session, res, &error);
-
   if (error) {
       std::string error_str = "";
       error_str.append(error->message);
@@ -624,6 +664,10 @@ MainWindow::~MainWindow(){
   }
   delete m_loginWindow;
   delete m_contactUsWindow;
+  if (login_progress_dialog) {
+    delete login_progress_dialog;
+  }
+  
 }
 
 void MainWindow::setLoginStatus(int status, std::string apiToken)

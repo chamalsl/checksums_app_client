@@ -27,6 +27,8 @@ public:
   void requestPkceApiKey();
   void cancelLoginProcess();
   void setConfig(std::unique_ptr<ChecksumsApp::Config> config);
+  void showLoginProgress();
+  void closeLoginProgress();
 
 protected:
   void selectFile();
@@ -45,6 +47,7 @@ protected:
   Gtk::Button m_showAboutBtn;
   Gtk::VBox m_mainContainer;
   TokenWindow* m_loginWindow;
+  Gtk::Dialog* login_progress_dialog = NULL;
   ContacUsWindow* m_contactUsWindow;
   
 private:
