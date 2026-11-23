@@ -15,6 +15,8 @@ protected:
   Gtk::Box m_boxLayout;
   Gtk::Box m_buttonsLayout;
 
+  bool on_delete_event(GdkEventAny* event) override;
+
 private:
   void cancel();
   void continueLogin();

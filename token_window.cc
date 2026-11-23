@@ -70,10 +70,17 @@ void TokenWindow::clearData()
     m_userCode.set_text("");
 }
 
-void TokenWindow::cancel(){
-  Gtk::MessageDialog dialog(*this, "Do you want to cancel login?", 
+bool TokenWindow::on_delete_event(GdkEventAny *event)
+{
+    cancel();
+    return true;
+}
+
+void TokenWindow::cancel()
+{
+    Gtk::MessageDialog dialog(*this, "Do you want to cancel login?",
                               false,
-                              Gtk::MESSAGE_QUESTION, 
+                              Gtk::MESSAGE_QUESTION,
                               Gtk::BUTTONS_YES_NO);
     dialog.set_secondary_text("This action cannot be undone.");
     int result = dialog.run();
@@ -88,7 +95,6 @@ void TokenWindow::cancel(){
         default:
             break;
     }
-  
 }
 
 void TokenWindow::continueLogin()
