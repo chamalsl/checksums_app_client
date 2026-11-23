@@ -12,7 +12,7 @@ std::string PKCE::getCodeVerifier()
 {
     std::vector<unsigned char> rand_data(96);
 
-    if (!RAND_bytes(rand_data.data(), rand_data.size())){
+    if (RAND_bytes(rand_data.data(), rand_data.size()) != 1){
         throw std::runtime_error("Could not generate random bytes!");
     }
 
